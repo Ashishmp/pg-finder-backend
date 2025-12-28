@@ -1,8 +1,10 @@
 package com.pgfinder.pg_finder_backend.service.impl;
 
 import com.pgfinder.pg_finder_backend.dto.request.CreateUserRequest;
+import com.pgfinder.pg_finder_backend.dto.request.LoginUserRequest;
 import com.pgfinder.pg_finder_backend.dto.response.UserResponse;
 import com.pgfinder.pg_finder_backend.entity.User;
+import com.pgfinder.pg_finder_backend.exception.AuthenticationException;
 import com.pgfinder.pg_finder_backend.repository.UserRepository;
 import com.pgfinder.pg_finder_backend.service.UserService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -40,6 +42,23 @@ public class UserServiceImpl implements UserService {
         response.setEmail(savedUser.getEmail());
         response.setPhone(savedUser.getPhone());
         response.setRole(savedUser.getRole());
+
+        return response;
+    }
+    @Override
+    public UserResponse loginUser(LoginUserRequest request){
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new AuthenticationException("User not found"));
+        if(!passwordEncoder.matches(request.getPassword(), user.getPassword()))
+            {
+            throw new AuthenticationException("Wrong password");
+            }
+        UserResponse response = new UserResponse();
+        response.setId(user.getId());
+        response.setName(user.getName());
+        response.setEmail(user.getEmail());
+        response.setPhone(user.getPhone());
+        response.setRole(user.getRole());
 
         return response;
     }

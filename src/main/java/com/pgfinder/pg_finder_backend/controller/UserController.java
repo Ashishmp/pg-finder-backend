@@ -1,6 +1,7 @@
 package com.pgfinder.pg_finder_backend.controller;
 
 import com.pgfinder.pg_finder_backend.dto.request.CreateUserRequest;
+import com.pgfinder.pg_finder_backend.dto.request.LoginUserRequest;
 import com.pgfinder.pg_finder_backend.dto.response.UserResponse;
 import com.pgfinder.pg_finder_backend.service.UserService;
 import jakarta.validation.Valid;
@@ -23,5 +24,10 @@ public class UserController{
     public ResponseEntity<?> createUser(@Valid @RequestBody CreateUserRequest request){
         UserResponse response = userService.createUser(request);
                 return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+    @PostMapping("/login")
+    public ResponseEntity<?> loginUser(@Valid @RequestBody LoginUserRequest request){
+        UserResponse response = userService.loginUser(request);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }
