@@ -5,6 +5,7 @@ import com.pgfinder.pg_finder_backend.dto.request.LoginUserRequest;
 import com.pgfinder.pg_finder_backend.dto.response.UserResponse;
 import com.pgfinder.pg_finder_backend.entity.User;
 import com.pgfinder.pg_finder_backend.exception.AuthenticationException;
+import com.pgfinder.pg_finder_backend.exception.BusinessException;
 import com.pgfinder.pg_finder_backend.repository.UserRepository;
 import com.pgfinder.pg_finder_backend.service.UserService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -22,10 +23,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponse createUser(CreateUserRequest request){
         if(userRepository.existsByEmail(request.getEmail())){
-            throw new RuntimeException("Email already exists");
+            throw new BusinessException("Email already exists");
         }
         if(userRepository.existsByPhone(request.getPhone())){
-            throw  new RuntimeException("Number already exists");
+            throw  new BusinessException("Number already exists");
         }
         User user = new User();
         user.setName(request.getName());

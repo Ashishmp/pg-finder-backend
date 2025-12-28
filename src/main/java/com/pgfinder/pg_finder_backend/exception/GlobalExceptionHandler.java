@@ -11,7 +11,18 @@ import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-   @ExceptionHandler(AuthenticationException.class)
+    @ExceptionHandler(BusinessException.class)
+    public ResponseEntity<?> handleBusinessException(BusinessException ex) {
+       Map<String, Object> error = new HashMap<>();
+       error.put("timestamp", LocalDateTime.now());
+       error.put("status", HttpStatus.BAD_REQUEST.value());
+       error.put("message", ex.getMessage());
+
+       return ResponseEntity
+               .status(HttpStatus.BAD_REQUEST)
+               .body(error);
+   }
+    @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<?> handleAuthenticationException(AuthenticationException ex) {
        Map<String, Object> error = new HashMap<>();
        error.put("timestamp", LocalDateTime.now());
