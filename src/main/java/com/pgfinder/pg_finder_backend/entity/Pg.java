@@ -31,6 +31,17 @@ public class Pg {
 
     private String description;
 
+    public String getContactNumber() {
+        return contactNumber;
+    }
+
+    public void setContactNumber(String contactNumber) {
+        this.contactNumber = contactNumber;
+    }
+
+    @Column(nullable = false)
+    private String contactNumber;
+
     public Long getId() {
         return id;
     }

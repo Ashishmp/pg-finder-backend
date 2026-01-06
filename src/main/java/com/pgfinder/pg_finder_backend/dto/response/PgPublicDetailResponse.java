@@ -1,34 +1,10 @@
 package com.pgfinder.pg_finder_backend.dto.response;
 
-public class PgResponse {
+import com.fasterxml.jackson.annotation.JsonInclude;
 
-    private Long id;
-    private String pgName;
-    private String pgAddress;
-    private String pgCity;
-    private String pgState;
-    private String pgCountry;
-    private String pgPostalCode;
-    private String description;
+@JsonInclude(JsonInclude.Include.NON_NULL)
 
-    public String getContactNumber() {
-        return contactNumber;
-    }
-
-    public void setContactNumber(String contactNumber) {
-        this.contactNumber = contactNumber;
-    }
-
-    private String contactNumber;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
+public class PgPublicDetailResponse {
     public String getPgName() {
         return pgName;
     }
@@ -84,4 +60,12 @@ public class PgResponse {
     public void setDescription(String description) {
         this.description = description;
     }
+
+    private String pgName;
+    private String pgAddress;
+    private String pgCity;
+    private String pgState;
+    private String pgCountry;
+    private String pgPostalCode;
+    private String description;
 }

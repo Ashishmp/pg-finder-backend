@@ -23,6 +23,9 @@ public class CreatePgRequest {
     @NotBlank
     @Length(max = 500)
     private String description;
+    @NotBlank
+    @Size(min = 10, max = 10)
+    private String contactNumber;
 
     public String getPgName() {
         return pgName;
@@ -78,5 +81,13 @@ public class CreatePgRequest {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getContactNumber() {
+        return contactNumber;
+    }
+
+    public void setContactNumber(String contactNumber) {
+        this.contactNumber = contactNumber;
     }
 }
