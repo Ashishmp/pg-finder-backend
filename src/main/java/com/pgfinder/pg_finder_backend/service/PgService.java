@@ -1,6 +1,7 @@
 package com.pgfinder.pg_finder_backend.service;
 
 import com.pgfinder.pg_finder_backend.dto.request.CreatePgRequest;
+import com.pgfinder.pg_finder_backend.dto.request.UpdateUserRequest;
 import com.pgfinder.pg_finder_backend.dto.response.PgPrivateDetailResponse;
 import com.pgfinder.pg_finder_backend.dto.response.PgPublicDetailResponse;
 import com.pgfinder.pg_finder_backend.dto.response.PgResponse;

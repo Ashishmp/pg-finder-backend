@@ -2,6 +2,7 @@ package com.pgfinder.pg_finder_backend.service.impl;
 
 import com.pgfinder.pg_finder_backend.dto.request.CreateUserRequest;
 import com.pgfinder.pg_finder_backend.dto.request.LoginUserRequest;
+import com.pgfinder.pg_finder_backend.dto.request.UpdateUserRequest;
 import com.pgfinder.pg_finder_backend.dto.response.UserResponse;
 import com.pgfinder.pg_finder_backend.entity.User;
 import com.pgfinder.pg_finder_backend.exception.AuthenticationException;
@@ -46,6 +47,36 @@ public class UserServiceImpl implements UserService {
 
         return response;
     }
+
+
+
+    @Override
+    public UserResponse updateUser(Long id, UpdateUserRequest request) {
+
+        User user = userRepository.findById(id)
+                .orElseThrow(() ->
+                        new BusinessException("User not found with id: " + id)
+                );
+
+        // email change check
+        if (!user.getEmail().equals(request.getEmail())
+                && userRepository.existsByEmail(request.getEmail())) {
+            throw new BusinessException("Email already exists");
+        }
+
+        user.setEmail(request.getEmail());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+
+        User updatedUser = userRepository.save(user);
+
+        UserResponse response = new UserResponse();
+        response.setId(updatedUser.getId());
+        response.setEmail(updatedUser.getEmail());
+        response.setRole(updatedUser.getRole());
+
+        return response;
+    }
+
     @Override
     public UserResponse loginUser(LoginUserRequest request){
         User user = userRepository.findByEmail(request.getEmail())
