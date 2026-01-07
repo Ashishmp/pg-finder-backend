@@ -39,7 +39,7 @@ public class UserServiceImpl implements UserService {
         User savedUser = userRepository.save(user);
 
         UserResponse response = new UserResponse();
-        response.setId(savedUser.getId());
+        response.setPgId(savedUser.getUserId());
         response.setName(savedUser.getName());
         response.setEmail(savedUser.getEmail());
         response.setPhone(savedUser.getPhone());
@@ -70,7 +70,7 @@ public class UserServiceImpl implements UserService {
         User updatedUser = userRepository.save(user);
 
         UserResponse response = new UserResponse();
-        response.setId(updatedUser.getId());
+        response.setPgId(updatedUser.getUserId());
         response.setEmail(updatedUser.getEmail());
         response.setRole(updatedUser.getRole());
 
@@ -86,7 +86,7 @@ public class UserServiceImpl implements UserService {
             throw new AuthenticationException("Wrong password");
             }
         UserResponse response = new UserResponse();
-        response.setId(user.getId());
+        response.setPgId(user.getUserId());
         response.setName(user.getName());
         response.setEmail(user.getEmail());
         response.setPhone(user.getPhone());

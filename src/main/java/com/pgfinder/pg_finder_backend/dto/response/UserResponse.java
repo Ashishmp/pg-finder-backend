@@ -1,12 +1,12 @@
 package com.pgfinder.pg_finder_backend.dto.response;
 
 public class UserResponse {
-    public Long getId() {
-        return id;
+    public Long getPgId() {
+        return pgId;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setPgId(Long pgId) {
+        this.pgId = pgId;
     }
 
     public String getName() {
@@ -41,7 +41,7 @@ public class UserResponse {
         this.role = role;
     }
 
-    private Long id;
+    private Long pgId;
     private String name;
     private String email;
     private String phone;

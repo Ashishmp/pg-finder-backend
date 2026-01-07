@@ -9,7 +9,7 @@ public class Pg {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long pgId;
 
     @Column(nullable = false)
     private String pgName;
@@ -42,12 +42,12 @@ public class Pg {
     @Column(nullable = false)
     private String contactNumber;
 
-    public Long getId() {
-        return id;
+    public Long getPgId() {
+        return pgId;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setPgId(Long pgId) {
+        this.pgId = pgId;
     }
 
     public String getPgName() {

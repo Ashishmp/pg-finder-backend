@@ -2,7 +2,7 @@ package com.pgfinder.pg_finder_backend.dto.response;
 
 public class PgResponse {
 
-    private Long id;
+    private Long pgId;
     private String pgName;
     private String pgAddress;
     private String pgCity;
@@ -21,12 +21,12 @@ public class PgResponse {
 
     private String contactNumber;
 
-    public Long getId() {
-        return id;
+    public Long getPgId() {
+        return pgId;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setPgId(Long pgId) {
+        this.pgId = pgId;
     }
 
     public String getPgName() {
