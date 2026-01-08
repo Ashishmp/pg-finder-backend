@@ -53,7 +53,7 @@ public class PgServiceImpl implements PgService {
         Pg savedPg = pgRepository.save(pg);
 
         PgResponse response = new PgResponse();
-        response.setPgId(savedPg.getPgId());
+        response.setPgId(savedPg.getId());
         response.setPgName(savedPg.getPgName());
         response.setPgAddress(savedPg.getPgAddress());
         response.setDescription(savedPg.getDescription());
@@ -90,7 +90,7 @@ public class PgServiceImpl implements PgService {
                 );
 
         PgPrivateDetailResponse response = new PgPrivateDetailResponse();
-        response.setPgId(pg.getPgId());
+        response.setPgId(pg.getId());
         response.setPgName(pg.getPgName());
         response.setPgAddress(pg.getPgAddress());
         response.setPgCity(pg.getPgCity());
