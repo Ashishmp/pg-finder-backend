@@ -3,7 +3,7 @@ package com.pgfinder.pg_finder_backend.controller;
 import com.pgfinder.pg_finder_backend.dto.common.ApiResponse;
 import com.pgfinder.pg_finder_backend.dto.request.CreateUserRequest;
 import com.pgfinder.pg_finder_backend.dto.request.LoginUserRequest;
-import com.pgfinder.pg_finder_backend.dto.request.RefreshTokenRequest;
+//import com.pgfinder.pg_finder_backend.dto.request.RefreshTokenRequest;
 import com.pgfinder.pg_finder_backend.dto.request.UpdateUserRequest;
 import com.pgfinder.pg_finder_backend.dto.response.LoginResponse;
 import com.pgfinder.pg_finder_backend.dto.response.UserResponse;
