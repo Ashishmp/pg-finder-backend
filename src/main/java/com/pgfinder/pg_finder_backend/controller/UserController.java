@@ -3,10 +3,12 @@ package com.pgfinder.pg_finder_backend.controller;
 import com.pgfinder.pg_finder_backend.dto.common.ApiResponse;
 import com.pgfinder.pg_finder_backend.dto.request.CreateUserRequest;
 import com.pgfinder.pg_finder_backend.dto.request.LoginUserRequest;
+import com.pgfinder.pg_finder_backend.dto.request.RefreshTokenRequest;
 import com.pgfinder.pg_finder_backend.dto.request.UpdateUserRequest;
 import com.pgfinder.pg_finder_backend.dto.response.LoginResponse;
 import com.pgfinder.pg_finder_backend.dto.response.UserResponse;
 import com.pgfinder.pg_finder_backend.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -47,6 +49,22 @@ public class UserController{
         );
     }
 
-//    @PostMapping("/logOut")
+    @PostMapping("/logout")
+    public ResponseEntity<ApiResponse<String>> logout(HttpServletRequest request) {
+        userService.logout(request);
+        return ResponseEntity.ok(
+                new ApiResponse<>(true, "Logged out successfully", "OK")
+        );
+    }
+
 //    @PostMapping("/refresh-token")
+//    public ResponseEntity<ApiResponse<LoginResponse>> refresh(@RequestBody RefreshTokenRequest request) {
+//
+//        LoginResponse response = userService.refreshToken(request);
+//
+//        return ResponseEntity.ok(
+//                new ApiResponse<>(true, "Token refreshed", response)
+//        );
+//    }
+
 }

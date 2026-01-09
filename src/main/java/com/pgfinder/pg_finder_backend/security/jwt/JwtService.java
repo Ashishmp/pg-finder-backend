@@ -1,10 +1,14 @@
 package com.pgfinder.pg_finder_backend.security.jwt;
 
+import com.pgfinder.pg_finder_backend.entity.TokenBlacklist;
+import com.pgfinder.pg_finder_backend.service.TokenBlacklistService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.jspecify.annotations.NonNull;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -53,7 +57,7 @@ public class JwtService {
         return extractClaim(token, Claims::getExpiration);
     }
 
-    private <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
+    private <T> T extractClaim(String token, @NonNull Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
     }
@@ -72,6 +76,18 @@ public class JwtService {
     public long getExpiration() {
         return expiration / 1000; // convert ms → seconds for API
     }
+    @Autowired
+    private TokenBlacklistService blacklistService;
+
+    public void blacklistToken(String token) {
+        blacklistService.blacklist(token);
+    }
+
+    public boolean isTokenBlacklisted(String token) {
+        return blacklistService.isBlacklisted(token);
+    }
+
+
 
 
 }

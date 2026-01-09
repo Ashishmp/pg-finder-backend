@@ -6,6 +6,15 @@ public class LoginResponse {
     private String tokenType = "Bearer";
     private long expiresIn;
 
+    public String getRefreshToken() {
+        return refreshToken;
+    }
+
+    public void setRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
+    }
+
+    private String refreshToken;
     private Long id;
     private String email;
     private String role;
@@ -57,4 +66,8 @@ public class LoginResponse {
     public void setRole(String role) {
         this.role = role;
     }
+
+
+
+
 }
