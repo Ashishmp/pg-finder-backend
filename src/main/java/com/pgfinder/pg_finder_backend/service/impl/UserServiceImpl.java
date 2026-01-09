@@ -3,12 +3,16 @@ package com.pgfinder.pg_finder_backend.service.impl;
 import com.pgfinder.pg_finder_backend.dto.request.CreateUserRequest;
 import com.pgfinder.pg_finder_backend.dto.request.LoginUserRequest;
 import com.pgfinder.pg_finder_backend.dto.request.UpdateUserRequest;
+import com.pgfinder.pg_finder_backend.dto.response.LoginResponse;
 import com.pgfinder.pg_finder_backend.dto.response.UserResponse;
 import com.pgfinder.pg_finder_backend.entity.User;
 import com.pgfinder.pg_finder_backend.exception.AuthenticationException;
 import com.pgfinder.pg_finder_backend.exception.BusinessException;
 import com.pgfinder.pg_finder_backend.repository.UserRepository;
+import com.pgfinder.pg_finder_backend.security.jwt.JwtService;
 import com.pgfinder.pg_finder_backend.service.UserService;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -17,8 +21,18 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private AuthenticationManager authenticationManager;
+    private JwtService jwtService;
+//    public UserServiceImpl(UserRepository userRepository){
+//        this.userRepository = userRepository;
+//    }
+    public UserServiceImpl(
+            AuthenticationManager authenticationManager,
+            JwtService jwtService,
+            UserRepository userRepository) {
 
-    public UserServiceImpl(UserRepository userRepository){
+        this.authenticationManager = authenticationManager;
+        this.jwtService = jwtService;
         this.userRepository = userRepository;
     }
     @Override
@@ -78,18 +92,24 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserResponse loginUser(LoginUserRequest request){
+    public LoginResponse loginUser(LoginUserRequest request) {
+
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        request.getEmail(),
+                        request.getPassword()
+                )
+        );
+
         User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new AuthenticationException("User not found"));
-        if(!passwordEncoder.matches(request.getPassword(), user.getPassword()))
-            {
-            throw new AuthenticationException("Wrong password");
-            }
-        UserResponse response = new UserResponse();
-        response.setPgId(user.getId());
-        response.setName(user.getName());
+                .orElseThrow(() -> new BusinessException("User not found"));
+
+        String token = jwtService.generateToken(user.getId(), user.getEmail());
+
+        LoginResponse response = new LoginResponse();
+        response.setToken(token);
+        response.setId(user.getId());
         response.setEmail(user.getEmail());
-        response.setPhone(user.getPhone());
         response.setRole(user.getRole());
 
         return response;
