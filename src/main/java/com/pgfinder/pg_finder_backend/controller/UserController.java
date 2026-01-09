@@ -1,5 +1,6 @@
 package com.pgfinder.pg_finder_backend.controller;
 
+import com.pgfinder.pg_finder_backend.dto.common.ApiResponse;
 import com.pgfinder.pg_finder_backend.dto.request.CreateUserRequest;
 import com.pgfinder.pg_finder_backend.dto.request.LoginUserRequest;
 import com.pgfinder.pg_finder_backend.dto.request.UpdateUserRequest;
@@ -12,7 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/users")
+@RequestMapping("/api/v1/auth")
 
 public class UserController{
     private final UserService userService;
@@ -20,18 +21,32 @@ public class UserController{
         this.userService = userService;
     }
     @PostMapping("/register")
-    public ResponseEntity<?> createUser(@Valid @RequestBody CreateUserRequest request){
+    public ResponseEntity<ApiResponse<UserResponse>> createUser(
+            @Valid @RequestBody CreateUserRequest request) {
         UserResponse response = userService.createUser(request);
-                return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(new ApiResponse<>(true, "User registered successfully", response));
     }
+
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> loginUser(@Valid @RequestBody LoginUserRequest request){
+    public ResponseEntity<ApiResponse<LoginResponse>> loginUser(@Valid @RequestBody LoginUserRequest request) {
         LoginResponse response = userService.loginUser(request);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        return ResponseEntity.ok(
+                new ApiResponse<>(true, "Login successful", response)
+        );
     }
+
     @PutMapping("/update/{id}")
-    public ResponseEntity<?> updateUser(@PathVariable Long id ,@Valid @RequestBody UpdateUserRequest request){
-//        UserResponse response = userService.updateUser(request);
-        return ResponseEntity.status(HttpStatus.OK).body(userService.updateUser(id, request));
+    public ResponseEntity<ApiResponse<UserResponse>> updateUser(
+            @PathVariable Long id,
+            @Valid @RequestBody UpdateUserRequest request) {
+        UserResponse response = userService.updateUser(id, request);
+        return ResponseEntity.ok(
+                new ApiResponse<>(true, "User updated successfully", response)
+        );
     }
+
+//    @PostMapping("/logOut")
+//    @PostMapping("/refresh-token")
 }

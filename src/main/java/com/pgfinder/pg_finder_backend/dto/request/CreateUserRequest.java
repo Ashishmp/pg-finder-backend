@@ -1,20 +1,31 @@
 package com.pgfinder.pg_finder_backend.dto.request;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
-import org.springframework.format.annotation.NumberFormat;
+import jakarta.validation.constraints.*;
 
 public class CreateUserRequest {
-    @NotBlank
+
+    @NotBlank(message = "Name is required")
+    @Size(min = 2, max = 50)
     private String name;
-    @NotBlank
-    @Email
+
+    @NotBlank(message = "Email is required")
+    @Email(message = "Invalid email format")
+    @Size(max = 100)
     private String email;
-    @NotBlank
+
+    @NotBlank(message = "Phone number is required")
+    @Pattern(
+            regexp = "^[6-9][0-9]{9}$",
+            message = "Phone number must be a valid Indian mobile number"
+    )
     private String phone;
-    @NotBlank
-    @Size(min = 8)
+
+    @NotBlank(message = "Password is required")
+    @Size(min = 8, max = 20)
+    @Pattern(
+            regexp = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@#$%^&+=]).*$",
+            message = "Password must contain uppercase, lowercase, number and special character"
+    )
     private String password;
 
     public String getName() {
@@ -48,6 +59,4 @@ public class CreateUserRequest {
     public void setPassword(String password) {
         this.password = password;
     }
-
-
 }

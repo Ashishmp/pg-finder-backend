@@ -41,3 +41,13 @@ public class PgController {
 
 
 }
+///api/pgs	POST	OWNER	Create PG
+///api/pgs/{pgId}	GET	ALL	View PG details
+///api/pgs/{pgId}	PUT	OWNER	Update PG
+///api/pgs/{pgId}	DELETE	OWNER	Soft delete
+///api/pgs/{pgId}/status	PATCH	OWNER/ADMIN	Activate / Pause
+//📍 PG ADDRESS & LOCATION
+//API	Method	Role	Functionality
+///api/pgs/{pgId}/address	PUT	OWNER	Update location
+///api/pgs/cities	GET	ALL	List cities
+///api/pgs/areas	GET	ALL	Areas by city
