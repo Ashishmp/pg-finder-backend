@@ -1,11 +1,13 @@
 package com.pgfinder.pg_finder_backend.service.impl;
 
 import com.pgfinder.pg_finder_backend.dto.request.CreatePgRequest;
+import com.pgfinder.pg_finder_backend.dto.request.UpdatePgRequest;
 import com.pgfinder.pg_finder_backend.dto.response.PgPrivateDetailResponse;
 import com.pgfinder.pg_finder_backend.dto.response.PgPublicDetailResponse;
 import com.pgfinder.pg_finder_backend.dto.response.PgResponse;
 import com.pgfinder.pg_finder_backend.entity.Pg;
 import com.pgfinder.pg_finder_backend.entity.User;
+import com.pgfinder.pg_finder_backend.enums.Role;
 import com.pgfinder.pg_finder_backend.exception.BusinessException;
 import com.pgfinder.pg_finder_backend.repository.PgRepository;
 import com.pgfinder.pg_finder_backend.repository.UserRepository;
@@ -26,6 +28,8 @@ public class PgServiceImpl implements PgService {
         this.userRepository = userRepository;
     }
 
+    // ---------------- CREATE ----------------
+
     @Override
     public PgResponse createPg(CreatePgRequest request, Long userId) {
 
@@ -45,66 +49,139 @@ public class PgServiceImpl implements PgService {
         pg.setPgState(request.getPgState());
         pg.setPgCountry(request.getPgCountry());
         pg.setPgPostalCode(request.getPgPostalCode());
-        pg.setOwner(owner);
         pg.setContactNumber(request.getContactNumber());
+        pg.setOwner(owner);
+        pg.setStatus("ACTIVE");
         pg.setCreatedAt(LocalDateTime.now());
         pg.setUpdatedAt(LocalDateTime.now());
 
-        Pg savedPg = pgRepository.save(pg);
-
-        PgResponse response = new PgResponse();
-        response.setPgId(savedPg.getId());
-        response.setPgName(savedPg.getPgName());
-        response.setPgAddress(savedPg.getPgAddress());
-        response.setDescription(savedPg.getDescription());
-        response.setPgCity(savedPg.getPgCity());
-        response.setPgState(savedPg.getPgState());
-        response.setPgCountry(savedPg.getPgCountry());
-        response.setPgPostalCode(savedPg.getPgPostalCode());
-        response.setContactNumber(savedPg.getContactNumber());
-
-        return response;
+        Pg saved = pgRepository.save(pg);
+        return mapToPgResponse(saved);
     }
+
+    // ---------------- PUBLIC ----------------
+
     @Override
     public List<PgPublicDetailResponse> getAllPgs() {
-        return pgRepository.findAll()
-                .stream()
-                .map(pg -> {
-                    PgPublicDetailResponse response = new PgPublicDetailResponse();
-                    response.setPgName(pg.getPgName());
-                    response.setPgCity(pg.getPgCity());
-                    response.setPgState(pg.getPgState());
-                    response.setDescription(pg.getDescription());
-                    return response;
-                })
+        return pgRepository.findAll().stream()
+                .filter(pg -> "ACTIVE".equals(pg.getStatus()))
+                .map(this::mapToPublic)
                 .toList();
     }
 
-
     @Override
-    public PgPrivateDetailResponse getPgById(Long pgId) {
-
+    public PgPublicDetailResponse getPublicPgById(Long pgId) {
         Pg pg = pgRepository.findById(pgId)
-                .orElseThrow(() ->
-                        new BusinessException("PG not found with id: " + pgId)
-                );
+                .orElseThrow(() -> new BusinessException("PG not found"));
 
-        PgPrivateDetailResponse response = new PgPrivateDetailResponse();
-        response.setPgId(pg.getId());
-        response.setPgName(pg.getPgName());
-        response.setPgAddress(pg.getPgAddress());
-        response.setPgCity(pg.getPgCity());
-        response.setPgState(pg.getPgState());
-        response.setPgCountry(pg.getPgCountry());
-        response.setPgPostalCode(pg.getPgPostalCode());
-        response.setDescription(pg.getDescription());
+        if (!"ACTIVE".equals(pg.getStatus())) {
+            throw new BusinessException("PG not available");
+        }
 
-        // contactNumber logic (later with JWT)
-        // response.setContactNumber(pg.getContactNumber());
-
-        return response;
+        return mapToPublic(pg);
     }
 
+    // ---------------- PRIVATE ----------------
 
+    @Override
+    public PgPrivateDetailResponse getPrivatePgById(Long pgId, Long userId) {
+        Pg pg = pgRepository.findById(pgId)
+                .orElseThrow(() -> new BusinessException("PG not found"));
 
+        return mapToPrivate(pg);
+    }
+
+    // ---------------- OWNER / ADMIN ----------------
+
+    @Override
+    public PgResponse updatePg(Long pgId, UpdatePgRequest request, Long userId) {
+        Pg pg = getPgForOwner(pgId, userId);
+
+        pg.setPgName(request.getPgName());
+        pg.setPgAddress(request.getPgAddress());
+        pg.setDescription(request.getDescription());
+        pg.setPgCity(request.getPgCity());
+        pg.setPgState(request.getPgState());
+        pg.setPgCountry(request.getPgCountry());
+        pg.setPgPostalCode(request.getPgPostalCode());
+        pg.setContactNumber(request.getContactNumber());
+        pg.setUpdatedAt(LocalDateTime.now());
+
+        return mapToPgResponse(pgRepository.save(pg));
+    }
+
+    @Override
+    public void deletePg(Long pgId, Long userId) {
+        Pg pg = getPgForOwnerOrAdmin(pgId, userId);
+        pg.setStatus("DELETED");
+        pgRepository.save(pg);
+    }
+
+    @Override
+    public PgResponse updatePgStatus(Long pgId, String status, Long userId) {
+        Pg pg = getPgForOwnerOrAdmin(pgId, userId);
+        pg.setStatus(status.toUpperCase());
+        return mapToPgResponse(pgRepository.save(pg));
+    }
+
+    // ---------------- SECURITY ----------------
+
+    private Pg getPgForOwner(Long pgId, Long userId) {
+        Pg pg = pgRepository.findById(pgId)
+                .orElseThrow(() -> new BusinessException("PG not found"));
+
+        if (!pg.getOwner().getId().equals(userId)) {
+            throw new BusinessException("You do not own this PG");
+        }
+        return pg;
+    }
+
+    private Pg getPgForOwnerOrAdmin(Long pgId, Long userId) {
+        Pg pg = pgRepository.findById(pgId)
+                .orElseThrow(() -> new BusinessException("PG not found"));
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException("User not found"));
+
+        if (!pg.getOwner().getId().equals(userId) && user.getRole() != Role.ADMIN) {
+            throw new BusinessException("Unauthorized");
+        }
+        return pg;
+    }
+
+    // ---------------- DTO MAPPERS ----------------
+
+    private PgResponse mapToPgResponse(Pg pg) {
+        PgResponse r = new PgResponse();
+        r.setPgId(pg.getId());
+        r.setPgName(pg.getPgName());
+        r.setPgCity(pg.getPgCity());
+        r.setPgState(pg.getPgState());
+        r.setStatus(pg.getStatus());
+        return r;
+    }
+
+    private PgPublicDetailResponse mapToPublic(Pg pg) {
+        PgPublicDetailResponse r = new PgPublicDetailResponse();
+        r.setPgId(pg.getId());
+        r.setPgName(pg.getPgName());
+        r.setPgCity(pg.getPgCity());
+        r.setPgState(pg.getPgState());
+        r.setDescription(pg.getDescription());
+        return r;
+    }
+
+    private PgPrivateDetailResponse mapToPrivate(Pg pg) {
+        PgPrivateDetailResponse r = new PgPrivateDetailResponse();
+        r.setPgId(pg.getId());
+        r.setPgName(pg.getPgName());
+        r.setPgAddress(pg.getPgAddress());
+        r.setPgCity(pg.getPgCity());
+        r.setPgState(pg.getPgState());
+        r.setPgCountry(pg.getPgCountry());
+        r.setPgPostalCode(pg.getPgPostalCode());
+        r.setDescription(pg.getDescription());
+        r.setContactNumber(pg.getContactNumber());
+        return r;
+    }
 }

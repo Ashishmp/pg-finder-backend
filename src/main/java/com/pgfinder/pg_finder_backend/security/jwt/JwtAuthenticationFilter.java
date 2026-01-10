@@ -1,5 +1,6 @@
 package com.pgfinder.pg_finder_backend.security.jwt;
 
+import com.pgfinder.pg_finder_backend.security.CustomUserDetails;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -56,8 +57,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
-            UserDetails userDetails =
-                    this.userDetailsService.loadUserByUsername(email);
+            CustomUserDetails userDetails =
+                    (CustomUserDetails) this.userDetailsService.loadUserByUsername(email);
+
 
             if (jwtService.isTokenValid(jwt, userDetails.getUsername())) {
 

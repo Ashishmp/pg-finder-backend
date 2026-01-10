@@ -1,27 +1,35 @@
-package com.pgfinder.pg_finder_backend.dto.response;
+package com.pgfinder.pg_finder_backend.dto.request;
 
-public class PgResponse {
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
-    private Long pgId;
+public class UpdatePgRequest {
+
+    @NotBlank(message = "PG name is required")
     private String pgName;
+
+    @NotBlank(message = "PG address is required")
     private String pgAddress;
+
+    @NotBlank(message = "City is required")
     private String pgCity;
+
+    @NotBlank(message = "State is required")
     private String pgState;
+
+    @NotBlank(message = "Country is required")
     private String pgCountry;
+
+    @NotBlank(message = "Postal code is required")
     private String pgPostalCode;
+
+    @Size(max = 500, message = "Description must be under 500 characters")
     private String description;
+
+    @NotBlank(message = "Contact number is required")
     private String contactNumber;
-    private String status;   // ACTIVE, PAUSED, DELETED
 
-    // -------- Getters & Setters --------
-
-    public Long getPgId() {
-        return pgId;
-    }
-
-    public void setPgId(Long pgId) {
-        this.pgId = pgId;
-    }
+    // ---- Getters & Setters ----
 
     public String getPgName() {
         return pgName;
@@ -85,13 +93,5 @@ public class PgResponse {
 
     public void setContactNumber(String contactNumber) {
         this.contactNumber = contactNumber;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
     }
 }

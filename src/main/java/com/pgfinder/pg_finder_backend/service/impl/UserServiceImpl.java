@@ -8,6 +8,7 @@ import com.pgfinder.pg_finder_backend.dto.response.LoginResponse;
 import com.pgfinder.pg_finder_backend.dto.response.UserResponse;
 import com.pgfinder.pg_finder_backend.entity.RefreshToken;
 import com.pgfinder.pg_finder_backend.entity.User;
+import com.pgfinder.pg_finder_backend.enums.Role;
 import com.pgfinder.pg_finder_backend.exception.BusinessException;
 import com.pgfinder.pg_finder_backend.repository.UserRepository;
 import com.pgfinder.pg_finder_backend.security.jwt.JwtService;
@@ -55,14 +56,14 @@ public class UserServiceImpl implements UserService {
         user.setEmail(request.getEmail());
         user.setPhone(request.getPhone());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setRole("USER");
+        user.setRole(Role.USER);
         User savedUser = userRepository.save(user);
         UserResponse response = new UserResponse();
         response.setId(savedUser.getId());
         response.setName(savedUser.getName());
         response.setEmail(savedUser.getEmail());
         response.setPhone(savedUser.getPhone());
-        response.setRole(savedUser.getRole());
+        response.setRole(savedUser.getRole().name());
         return response;
     }
 
@@ -92,7 +93,7 @@ public class UserServiceImpl implements UserService {
         response.setName(saved.getName());
         response.setEmail(saved.getEmail());
         response.setPhone(saved.getPhone());
-        response.setRole(saved.getRole());
+        response.setRole(user.getRole().name());
 
         return response;
     }
@@ -139,7 +140,7 @@ public class UserServiceImpl implements UserService {
         response.setExpiresIn(jwtService.getExpiration());
         response.setId(user.getId());
         response.setEmail(user.getEmail());
-        response.setRole(user.getRole());
+        response.setRole(user.getRole().name());
 
         return response;
     }

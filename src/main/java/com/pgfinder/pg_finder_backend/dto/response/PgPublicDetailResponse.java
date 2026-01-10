@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 
 public class PgPublicDetailResponse {
+    private Long pgId;
+
     public String getPgName() {
         return pgName;
     }
@@ -68,4 +70,12 @@ public class PgPublicDetailResponse {
     private String pgCountry;
     private String pgPostalCode;
     private String description;
+
+    public void setPgId(Long pgId) {
+        this.pgId = pgId;
+    }
+
+    public Long getPgId() {
+        return pgId;
+    }
 }
