@@ -9,7 +9,6 @@ import com.pgfinder.pg_finder_backend.dto.response.UserResponse;
 import com.pgfinder.pg_finder_backend.entity.RefreshToken;
 import com.pgfinder.pg_finder_backend.entity.User;
 import com.pgfinder.pg_finder_backend.exception.BusinessException;
-import com.pgfinder.pg_finder_backend.repository.RefreshTokenRepository;
 import com.pgfinder.pg_finder_backend.repository.UserRepository;
 import com.pgfinder.pg_finder_backend.security.jwt.JwtService;
 import com.pgfinder.pg_finder_backend.service.UserService;
@@ -20,14 +19,16 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-    private AuthenticationManager authenticationManager;
-    private JwtService jwtService;
+    private final AuthenticationManager authenticationManager;
+    private final JwtService jwtService;
 //    private RefreshTokenRepository refreshTokenRepository;
 
     public UserServiceImpl(
@@ -70,20 +71,29 @@ public class UserServiceImpl implements UserService {
 
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new BusinessException("User not found"));
-        // Check if email is changing
+
         if (!user.getEmail().equals(request.getEmail())
                 && userRepository.existsByEmail(request.getEmail())) {
             throw new BusinessException("Email already exists");
         }
+        if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
+            throw new BusinessException("Current password is incorrect");
+        }
         user.setEmail(request.getEmail());
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
+
+        if (request.getNewPassword() != null && !request.getNewPassword().isBlank()) {
+            user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        }
+
         User saved = userRepository.save(user);
+
         UserResponse response = new UserResponse();
         response.setId(saved.getId());
         response.setName(saved.getName());
         response.setEmail(saved.getEmail());
         response.setPhone(saved.getPhone());
         response.setRole(saved.getRole());
+
         return response;
     }
 
@@ -158,5 +168,17 @@ public class UserServiceImpl implements UserService {
 //    }
 
 
+    @Service
+    public static class TokenBlacklistService {
 
+        private final Set<String> blacklistedTokens = ConcurrentHashMap.newKeySet();
+
+        public void blacklist(String token) {
+            blacklistedTokens.add(token);
+        }
+
+        public boolean isBlacklisted(String token) {
+            return blacklistedTokens.contains(token);
+        }
+    }
 }

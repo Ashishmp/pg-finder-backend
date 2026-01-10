@@ -1,7 +1,6 @@
 package com.pgfinder.pg_finder_backend.security.jwt;
 
-import com.pgfinder.pg_finder_backend.entity.TokenBlacklist;
-import com.pgfinder.pg_finder_backend.service.TokenBlacklistService;
+import com.pgfinder.pg_finder_backend.service.impl.UserServiceImpl;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -77,7 +76,7 @@ public class JwtService {
         return expiration / 1000; // convert ms → seconds for API
     }
     @Autowired
-    private TokenBlacklistService blacklistService;
+    private UserServiceImpl.TokenBlacklistService blacklistService;
 
     public void blacklistToken(String token) {
         blacklistService.blacklist(token);

@@ -13,12 +13,12 @@ public class UpdateUserRequest {
         this.email = email;
     }
 
-    public String getPassword() {
-        return password;
+    public String getCurrentPassword() {
+        return currentPassword;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setCurrentPassword(String currentPassword) {
+        this.currentPassword = currentPassword;
     }
 
     @NotBlank
@@ -26,5 +26,17 @@ public class UpdateUserRequest {
     private String email;
     @NotBlank
     @Size(min = 8)
-    private String password;
+    private String currentPassword;
+
+    public String getNewPassword() {
+        return newPassword;
+    }
+
+    public void setNewPassword(String newPassword) {
+        this.newPassword = newPassword;
+    }
+
+    @NotBlank
+    @Size(min = 8)
+    private String newPassword;
 }
