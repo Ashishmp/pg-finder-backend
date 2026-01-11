@@ -28,23 +28,53 @@ public class SecurityConfig {
 
         http
                 .csrf(csrf -> csrf.disable())
-
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.POST,
+
+                        // ======================
+                        // AUTH (Public)
+                        // ======================
+                        .requestMatchers(
                                 "/api/v1/auth/register",
                                 "/api/v1/auth/login"
                         ).permitAll()
+
+                        // ======================
+                        // Swagger (Public)
+                        // ======================
                         .requestMatchers(
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html"
                         ).permitAll()
 
-                        .requestMatchers(HttpMethod.GET,"/api/v1/pgs/**", "/api/v1/owners/me/**").permitAll()
+                        // ======================
+                        // Public PG & Room browsing
+                        // ======================
+                        .requestMatchers(HttpMethod.GET, "/api/v1/pgs/**").permitAll()
 
+                        // ======================
+                        // Room Management (OWNER only)
+                        // ======================
+                        .requestMatchers(HttpMethod.POST, "/api/v1/pgs/*/rooms").hasRole("PG_OWNER")
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/rooms/**").hasRole("PG_OWNER")
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/rooms/**").hasRole("PG_OWNER")
+
+                        // ======================
+                        // Owner APIs
+                        // ======================
+                        .requestMatchers("/api/v1/owners/**").hasRole("PG_OWNER")
+
+                        // ======================
+                        // Admin APIs
+                        // ======================
+                        .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
+
+                        // ======================
+                        // Everything else
+                        // ======================
                         .anyRequest().authenticated()
                 )
 

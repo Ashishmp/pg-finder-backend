@@ -1,10 +1,17 @@
 package com.pgfinder.pg_finder_backend.entity;
 
+import com.pgfinder.pg_finder_backend.enums.RoomStatus;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "rooms")
+@Table(
+        name = "rooms",
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = {"pg_id", "sharingType", "isAc"})
+        }
+)
+
 public class Room {
 
     @Id
@@ -22,6 +29,17 @@ public class Room {
     private Boolean isAc;
 
     private LocalDateTime createdAt;
+
+    public RoomStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(RoomStatus status) {
+        this.status = status;
+    }
+
+    @Enumerated(EnumType.STRING)
+    private RoomStatus status;   // ACTIVE, INACTIVE
 
     @PrePersist
     public void onCreate() {
