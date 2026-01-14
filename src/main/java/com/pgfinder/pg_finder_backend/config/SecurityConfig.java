@@ -73,9 +73,18 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
 
                         // ======================
+                        //Booking APIs
+                        // ======================
+                        .requestMatchers("/api/v1/bookings/me").hasRole("USER")
+                        .requestMatchers("/api/v1/bookings/owner").hasRole("PG_OWNER")
+                        .requestMatchers("/api/v1/bookings/**").authenticated()
+
+
+                        // ======================
                         // Everything else
                         // ======================
                         .anyRequest().authenticated()
+
                 )
 
                 .formLogin(form -> form.disable())

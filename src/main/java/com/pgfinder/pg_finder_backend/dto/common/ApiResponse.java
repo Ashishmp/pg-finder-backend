@@ -11,6 +11,10 @@ public class ApiResponse<T> {
         this.data = data;
     }
 
+    public static <T> ApiResponse<T> failure(String message) {
+        return new ApiResponse<>(false, message, null);
+    }
+
     public boolean isSuccess() {
         return success;
     }
