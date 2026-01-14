@@ -18,6 +18,10 @@ public class OwnerController {
 
     public OwnerController(OwnerService ownerService) {this.ownerService = ownerService;}
 
+    // ========================
+    //OWNER: see all the pg added by owner
+    // ========================
+
     @GetMapping("/pgs")
     public ResponseEntity<ApiResponse<List<PgResponse>>> getMyPgs(){
         Long userId = AuthUtil.getUserId();
@@ -25,6 +29,10 @@ public class OwnerController {
                 new ApiResponse<>(true, "Your PG fetched", ownerService.getMyPgs(userId))
         );
     }
+
+    // ========================
+    //OWNER: see the specific pg through id added by owner
+    // ========================
 
     @GetMapping("/pgs/{pgId}")
     public ResponseEntity<ApiResponse<PgResponse>> getMyPg(@PathVariable Long pgId){

@@ -25,7 +25,10 @@ public class PgController {
         this.pgService = pgService;
     }
 
+    // ========================
     // Create PG (Logged-in USER becomes OWNER of this PG)
+    // ========================
+
     @PostMapping
     public ResponseEntity<ApiResponse<PgResponse>> createPg(
             @Valid @RequestBody CreatePgRequest request) {
@@ -38,7 +41,10 @@ public class PgController {
 
     }
 
+    // ========================
     // Public – List all PGs (no contact numbers)
+    // ========================
+
     @GetMapping
     public ResponseEntity<ApiResponse<List<PgPublicDetailResponse>>> getAllPgs() {
         List<PgPublicDetailResponse> pgs = pgService.getAllPgs();
@@ -47,7 +53,10 @@ public class PgController {
         );
     }
 
+    // ========================
     // Public – View PG details (no contact)
+    // ========================
+
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<PgPublicDetailResponse>> getPublicPg(@PathVariable Long id) {
 
@@ -58,7 +67,10 @@ public class PgController {
         );
     }
 
+    // ========================
     // Private – View PG with contact (JWT required)
+    // ========================
+
     @GetMapping("/{id}/full")
     public ResponseEntity<ApiResponse<PgPrivateDetailResponse>> getPrivatePg(@PathVariable Long id) {
         Long userId = AuthUtil.getUserId();
@@ -68,7 +80,10 @@ public class PgController {
         );
     }
 
+    // ========================
     // Owner-only – Update PG
+    // ========================
+
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<PgResponse>> updatePg(
             @PathVariable Long id,
@@ -81,7 +96,10 @@ public class PgController {
         );
     }
 
+    // ========================
     // Owner or Admin – Soft delete PG
+    // ========================
+
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> deletePg(@PathVariable Long id) {
 
@@ -93,7 +111,10 @@ public class PgController {
         );
     }
 
+    // ========================
     // Owner or Admin – Activate / Pause PG
+    // ========================
+
     @PatchMapping("/{id}/status")
     public ResponseEntity<ApiResponse<PgResponse>> changePgStatus(
             @PathVariable Long id,

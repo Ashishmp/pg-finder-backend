@@ -18,7 +18,10 @@ public class RoomController {
         this.roomService = roomService;
     }
 
+    // ========================
     // OWNER: Add room
+    // ========================
+
     @PostMapping("/pgs/{pgId}")
     public ResponseEntity<ApiResponse<Room>> createRoom(
             @PathVariable Long pgId,
@@ -28,7 +31,10 @@ public class RoomController {
         return ResponseEntity.ok(new ApiResponse<>(true,"Room created successfully", room));
     }
 
+    // ========================
     // ALL: List rooms
+    // ========================
+
     @GetMapping("/pgs/{pgId}")
     public ResponseEntity<ApiResponse<List<Room>>> getRooms(@PathVariable Long pgId) {
         List<Room> rooms = roomService.getRoomsForPublicOrOwner(pgId);
@@ -37,7 +43,10 @@ public class RoomController {
         );
     }
 
+    // ========================
     // OWNER: Update room
+    // ========================
+
     @PutMapping("/{roomId}")
     public ResponseEntity<ApiResponse<Room>> updateRoom(
             @PathVariable Long roomId,
@@ -49,7 +58,10 @@ public class RoomController {
         );
     }
 
+    // ========================
     // OWNER: Remove room
+    // ========================
+
     @DeleteMapping("/{roomId}")
     public ResponseEntity<ApiResponse<Void>> deleteRoom(@PathVariable Long roomId) {
         roomService.disableRoom(roomId);

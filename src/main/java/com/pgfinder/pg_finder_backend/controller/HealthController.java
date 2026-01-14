@@ -5,6 +5,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class HealthController {
+
+    // ========================
+    // Health Check initial
+    // ========================
     @GetMapping("/api/public/health-check")
     public String Health(){
         return "PG Finder Backend is running";

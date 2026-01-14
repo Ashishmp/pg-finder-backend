@@ -22,6 +22,11 @@ public class UserController{
     public UserController(UserService userService){
         this.userService = userService;
     }
+
+    // ========================
+    //USER: Register/Create the account
+    // ========================
+
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<UserResponse>> createUser(
             @Valid @RequestBody CreateUserRequest request) {
@@ -31,6 +36,10 @@ public class UserController{
                 .body(new ApiResponse<>(true, "User registered successfully", response));
     }
 
+    // ========================
+    //USER: user can login from credentials
+    // ========================
+
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<LoginResponse>> loginUser(@Valid @RequestBody LoginUserRequest request) {
         LoginResponse response = userService.loginUser(request);
@@ -38,6 +47,10 @@ public class UserController{
                 new ApiResponse<>(true, "Login successful", response)
         );
     }
+
+    // ========================
+    //USER: user can update his password
+    // ========================
 
     @PutMapping("/update/{id}")
     public ResponseEntity<ApiResponse<UserResponse>> updateUser(
@@ -48,6 +61,10 @@ public class UserController{
                 new ApiResponse<>(true, "User updated successfully", response)
         );
     }
+
+    // ========================
+    //USER: user can logout from the profile
+    // ========================
 
     @PostMapping("/logout")
     public ResponseEntity<ApiResponse<String>> logout(HttpServletRequest request) {
