@@ -1,6 +1,7 @@
 package com.pgfinder.pg_finder_backend.service;
 
 import com.pgfinder.pg_finder_backend.entity.Booking;
+import com.pgfinder.pg_finder_backend.entity.User;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -16,4 +17,7 @@ public interface BookingService {
     List<Booking> getMyBookings();
 
     List<Booking> getBookingsForMyPgs();
+    Booking vacateBooking(Long bookingId);
+    Booking checkInBooking(Long bookingId);
+
 }

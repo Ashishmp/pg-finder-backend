@@ -34,4 +34,6 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             LocalDate endDate,
             LocalDate startDate
     );
+    List<Booking> findByPgOwner(User owner);
+
 }

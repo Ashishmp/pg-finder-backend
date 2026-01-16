@@ -79,6 +79,7 @@ public class BookingServiceImpl implements BookingService {
         booking.setRoom(room);
         booking.setStartDate(startDate);
         booking.setPrice(room.getRent());
+        booking.setStatus(BookingStatus.PENDING);
 
         return bookingRepository.save(booking);
     }
@@ -143,13 +144,16 @@ public class BookingServiceImpl implements BookingService {
         }
 
         // If bed was locked, release it
-        if (booking.getStatus() == BookingStatus.CONFIRMED ||
-                booking.getStatus() == BookingStatus.CHECKED_IN) {
+        if (booking.getStatus() == BookingStatus.CHECKED_IN) {
+            throw new RuntimeException("Checked-in booking must be vacated, not cancelled");
+        }
 
+        if (booking.getStatus() == BookingStatus.CONFIRMED) {
             Room room = booking.getRoom();
             room.setAvailableBeds(room.getAvailableBeds() + 1);
             roomRepository.save(room);
         }
+
 
         booking.setStatus(BookingStatus.CANCELLED);
         return bookingRepository.save(booking);
@@ -169,6 +173,73 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public List<Booking> getBookingsForMyPgs() {
         User owner = getCurrentUser();
-        return bookingRepository.findByPgId(owner.getId());
+        return bookingRepository.findByPgOwner(owner);
     }
+
+    // ===============================
+    // OWNER and ADMIN can only fill check in date
+    // ===============================
+
+    @Override
+    @Transactional
+    public Booking checkInBooking(Long bookingId) {
+
+        User owner = getCurrentUser();
+
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new RuntimeException("Booking not found"));
+
+        boolean isOwner = booking.getPg().getOwner().getId().equals(owner.getId());
+        boolean isAdmin = owner.getRole().name().equals("ADMIN");
+
+        if (!isOwner && !isAdmin) {
+            throw new RuntimeException("You are not allowed to check in");
+        }
+
+        if (booking.getStatus() != BookingStatus.CONFIRMED) {
+            throw new RuntimeException("Booking must be approved before check-in");
+        }
+
+        booking.setStatus(BookingStatus.CHECKED_IN);
+        return bookingRepository.save(booking);
+    }
+
+
+    // ===============================
+    // OWNER and ADMIN can only fill checkout date
+    // ===============================
+
+    @Override
+    @Transactional
+    public Booking vacateBooking(Long bookingId) {
+
+        User currentUser = getCurrentUser();
+
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new RuntimeException("Booking not found"));
+
+        // Only OWNER or ADMIN can vacate
+        boolean isOwner = booking.getPg().getOwner().getId().equals(currentUser.getId());
+        boolean isAdmin = currentUser.getRole().name().equals("ADMIN");
+
+        if (!isOwner && !isAdmin) {
+            throw new RuntimeException("You are not allowed to vacate this booking");
+        }
+
+        if (booking.getStatus() != BookingStatus.CHECKED_IN) {
+            throw new RuntimeException("Only checked-in bookings can be vacated");
+        }
+
+        // Set checkout date
+        booking.setEndDate(LocalDate.now());
+        booking.setStatus(BookingStatus.COMPLETED);
+
+        // Release bed
+        Room room = booking.getRoom();
+        room.setAvailableBeds(room.getAvailableBeds() + 1);
+        roomRepository.save(room);
+
+        return bookingRepository.save(booking);
+    }
+
 }

@@ -55,6 +55,9 @@ public class Pg {
     public void onUpdate() {
         updatedAt = LocalDateTime.now();
     }
+    private Double averageRating = 0.0;
+    private Integer totalReviews = 0;
+
 
     // ---------- Getters & Setters ----------
 
@@ -157,4 +160,23 @@ public class Pg {
         this.updatedAt = updatedAt;
     }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Double getAverageRating() {
+        return averageRating;
+    }
+
+    public void setAverageRating(Double averageRating) {
+        this.averageRating = averageRating;
+    }
+
+    public Integer getTotalReviews() {
+        return totalReviews;
+    }
+
+    public void setTotalReviews(Integer totalReviews) {
+        this.totalReviews = totalReviews;
+    }
 }

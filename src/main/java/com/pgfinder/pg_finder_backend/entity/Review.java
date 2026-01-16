@@ -4,20 +4,28 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "reviews")
+@Table(name = "reviews",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"booking_id"}))
 public class Review {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // One review per booking
+    @OneToOne
+    @JoinColumn(name = "booking_id", nullable = false)
+    private Booking booking;
+
     @ManyToOne
+    @JoinColumn(name = "pg_id", nullable = false)
     private Pg pg;
 
     @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    private Integer rating;
+    private Integer rating;   // 1–5
     private String comment;
 
     private LocalDateTime createdAt;
@@ -33,6 +41,14 @@ public class Review {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Booking getBooking() {
+        return booking;
+    }
+
+    public void setBooking(Booking booking) {
+        this.booking = booking;
     }
 
     public Pg getPg() {
@@ -75,6 +91,7 @@ public class Review {
         this.createdAt = createdAt;
     }
 }
+
 
 
 

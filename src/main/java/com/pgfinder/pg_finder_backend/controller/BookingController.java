@@ -53,7 +53,7 @@ public class BookingController {
     public ResponseEntity<ApiResponse<BookingResponse>> cancelBooking(@PathVariable Long bookingId) {
         Booking booking = bookingService.cancelBooking(bookingId);
         return ResponseEntity.ok(
-                new ApiResponse<>(true,"Booking requested successfully", BookingMapper.toResponse(booking))
+                new ApiResponse<>(true,"Booking cancelled successfully", BookingMapper.toResponse(booking))
         );
     }
 
@@ -78,4 +78,40 @@ public class BookingController {
                 new ApiResponse<>(true, "My bookings requested successfully", BookingMapper.toResponse(bookings))
         );
     }
+
+    // ==============================
+    // OWNER/ADMIN: add checkin date
+    // ==============================
+
+    @PutMapping("/{bookingId}/check-in")
+    public ResponseEntity<ApiResponse<BookingResponse>> checkInBooking(
+            @PathVariable Long bookingId) {
+
+        Booking booking = bookingService.checkInBooking(bookingId);
+
+        return ResponseEntity.ok(
+                new ApiResponse<>(true, "Tenant checked in successfully",
+                        BookingMapper.toResponse(booking))
+        );
+    }
+
+    // ==============================
+    // OWNER/ADMIN: vacate tenant
+    // ==============================
+
+    @PutMapping("/{bookingId}/vacate")
+    public ResponseEntity<ApiResponse<BookingResponse>> vacateBooking(
+            @PathVariable Long bookingId) {
+
+        Booking booking = bookingService.vacateBooking(bookingId);
+
+        return ResponseEntity.ok(
+                new ApiResponse<>(
+                        true,
+                        "Tenant vacated successfully",
+                        BookingMapper.toResponse(booking)
+                )
+        );
+    }
+
 }
