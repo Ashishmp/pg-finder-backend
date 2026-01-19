@@ -1,21 +1,23 @@
 package com.pgfinder.pg_finder_backend.service.impl;
 
-import com.pgfinder.pg_finder_backend.dto.request.CreateUserRequest;
-import com.pgfinder.pg_finder_backend.dto.request.LoginUserRequest;
+import com.pgfinder.pg_finder_backend.dto.request.*;
 //import com.pgfinder.pg_finder_backend.dto.request.RefreshTokenRequest;
-import com.pgfinder.pg_finder_backend.dto.request.UpdateUserRequest;
 import com.pgfinder.pg_finder_backend.dto.response.LoginResponse;
+import com.pgfinder.pg_finder_backend.dto.response.UserProfileResponse;
 import com.pgfinder.pg_finder_backend.dto.response.UserResponse;
 import com.pgfinder.pg_finder_backend.entity.RefreshToken;
 import com.pgfinder.pg_finder_backend.entity.User;
 import com.pgfinder.pg_finder_backend.enums.Role;
 import com.pgfinder.pg_finder_backend.exception.BusinessException;
+import com.pgfinder.pg_finder_backend.mapper.UserMapper;
 import com.pgfinder.pg_finder_backend.repository.UserRepository;
 import com.pgfinder.pg_finder_backend.security.jwt.JwtService;
 import com.pgfinder.pg_finder_backend.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.transaction.Transactional;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -182,4 +184,46 @@ public class UserServiceImpl implements UserService {
             return blacklistedTokens.contains(token);
         }
     }
+    @Override
+    public UserProfileResponse getMyProfile() {
+        User user = getCurrentUser();
+        return UserMapper.toProfile(user);
+    }
+
+    @Override
+    @Transactional
+    public UserProfileResponse updateProfile(UpdateProfileRequest request) {
+
+        User user = getCurrentUser();
+
+        user.setName(request.getName());
+        user.setPhone(request.getPhone());
+
+        return UserMapper.toProfile(userRepository.save(user));
+    }
+
+    @Override
+    @Transactional
+    public void changePassword(ChangePasswordRequest request) {
+
+        User user = getCurrentUser();
+
+        if (!passwordEncoder.matches(
+                request.getOldPassword(), user.getPassword())) {
+            throw new RuntimeException("Old password is incorrect");
+        }
+
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+    }
+    private User getCurrentUser() {
+        String email = SecurityContextHolder.getContext()
+                .getAuthentication()
+                .getName();
+
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+    }
+
+
 }

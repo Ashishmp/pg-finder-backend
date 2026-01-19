@@ -1,10 +1,9 @@
 package com.pgfinder.pg_finder_backend.service;
 
-import com.pgfinder.pg_finder_backend.dto.request.CreateUserRequest;
-import com.pgfinder.pg_finder_backend.dto.request.LoginUserRequest;
+import com.pgfinder.pg_finder_backend.dto.request.*;
 //import com.pgfinder.pg_finder_backend.dto.request.RefreshTokenRequest;
-import com.pgfinder.pg_finder_backend.dto.request.UpdateUserRequest;
 import com.pgfinder.pg_finder_backend.dto.response.LoginResponse;
+import com.pgfinder.pg_finder_backend.dto.response.UserProfileResponse;
 import com.pgfinder.pg_finder_backend.dto.response.UserResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.core.Authentication;
@@ -17,4 +16,8 @@ public interface UserService {
     UserResponse updateUser(Long id, UpdateUserRequest request);
     void logout(HttpServletRequest request);
 //    LoginResponse refreshToken(RefreshTokenRequest request);
+UserProfileResponse getMyProfile();
+    UserProfileResponse updateProfile(UpdateProfileRequest request);
+    void changePassword(ChangePasswordRequest request);
+
 }
