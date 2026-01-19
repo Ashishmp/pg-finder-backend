@@ -7,11 +7,13 @@ import com.pgfinder.pg_finder_backend.dto.response.PgPublicDetailResponse;
 import com.pgfinder.pg_finder_backend.dto.response.PgResponse;
 import com.pgfinder.pg_finder_backend.entity.Pg;
 import com.pgfinder.pg_finder_backend.entity.User;
+import com.pgfinder.pg_finder_backend.enums.PgStatus;
 import com.pgfinder.pg_finder_backend.enums.Role;
 import com.pgfinder.pg_finder_backend.exception.BusinessException;
 import com.pgfinder.pg_finder_backend.repository.PgRepository;
 import com.pgfinder.pg_finder_backend.repository.UserRepository;
 import com.pgfinder.pg_finder_backend.service.PgService;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -27,8 +29,9 @@ public class PgServiceImpl implements PgService {
         this.pgRepository = pgRepository;
         this.userRepository = userRepository;
     }
-
+    // ----------------------------------------
     // ---------------- CREATE ----------------
+    // ----------------------------------------
 
     @Override
     public PgResponse createPg(CreatePgRequest request, Long userId) {
@@ -51,7 +54,7 @@ public class PgServiceImpl implements PgService {
         pg.setPgPostalCode(request.getPgPostalCode());
         pg.setContactNumber(request.getContactNumber());
         pg.setOwner(owner);
-        pg.setStatus("ACTIVE");
+        pg.setStatus(PgStatus.PENDING.name());
         pg.setCreatedAt(LocalDateTime.now());
         pg.setUpdatedAt(LocalDateTime.now());
 
@@ -80,8 +83,9 @@ public class PgServiceImpl implements PgService {
 
         return mapToPublic(pg);
     }
-
+    // -----------------------------------------
     // ---------------- PRIVATE ----------------
+    // -----------------------------------------
 
     @Override
     public PgPrivateDetailResponse getPrivatePgById(Long pgId, Long userId) {
@@ -90,8 +94,9 @@ public class PgServiceImpl implements PgService {
 
         return mapToPrivate(pg);
     }
-
+    // -----------------------------------------------
     // ---------------- OWNER / ADMIN ----------------
+    // -----------------------------------------------
 
     @Override
     public PgResponse updatePg(Long pgId, UpdatePgRequest request, Long userId) {
@@ -123,8 +128,9 @@ public class PgServiceImpl implements PgService {
         pg.setStatus(status.toUpperCase());
         return mapToPgResponse(pgRepository.save(pg));
     }
-
+    // ------------------------------------------
     // ---------------- SECURITY ----------------
+    // ------------------------------------------
 
     private Pg getPgForOwner(Long pgId, Long userId) {
         Pg pg = pgRepository.findById(pgId)
@@ -148,8 +154,9 @@ public class PgServiceImpl implements PgService {
         }
         return pg;
     }
-
+    // ---------------------------------------------
     // ---------------- DTO MAPPERS ----------------
+    // ---------------------------------------------
 
     private PgResponse mapToPgResponse(Pg pg) {
         PgResponse r = new PgResponse();
@@ -184,4 +191,40 @@ public class PgServiceImpl implements PgService {
         r.setContactNumber(pg.getContactNumber());
         return r;
     }
+    @Override
+    public List<Pg> getPendingPgs() {
+        return pgRepository.findByStatus(PgStatus.PENDING);
+    }
+
+    @Override
+    @Transactional
+    public Pg approvePg(Long pgId) {
+
+        Pg pg = pgRepository.findById(pgId)
+                .orElseThrow(() -> new RuntimeException("PG not found"));
+
+        if (!pg.getStatus().equals(PgStatus.PENDING.name())) {
+            throw new RuntimeException("Only pending PGs can be approved");
+        }
+
+        pg.setStatus(PgStatus.ACTIVE.name());
+        return pgRepository.save(pg);
+    }
+
+
+    @Override
+    @Transactional
+    public Pg rejectPg(Long pgId) {
+
+        Pg pg = pgRepository.findById(pgId)
+                .orElseThrow(() -> new RuntimeException("PG not found"));
+
+        if (pg.getStatus() != PgStatus.PENDING.name()) {
+            throw new RuntimeException("Only pending PGs can be rejected");
+        }
+
+        pg.setStatus(PgStatus.REJECTED.name());
+        return pgRepository.save(pg);
+    }
+
 }
