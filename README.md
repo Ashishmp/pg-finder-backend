@@ -9,21 +9,36 @@ This backend service powers the PG Finder ecosystem and is designed for scalabil
 
 ✔️ Authentication & Authorization
 Role-based access using JWT tokens (User, PG Owner, Admin).
-✔️ PG Listings
-Create, list, update, and view PG details.
-✔️ Room Management
-Maintain available rooms for different PGs.
-✔️ Bookings
-Users can book rooms; owners/admins can view and manage bookings.
-✔️ Reviews & Ratings
-Users can leave reviews for PGs.
-✔️ Robust Error Handling & Validation
-Clear response objects with HTTP status codes.
-✔️ API Documentation (Swagger UI)
-Integrated OpenAPI documentation for rapid API understanding.
-✔️ Dockerization
-Optional container deployment using Docker.
 
+✔️ PG Listings
+Create, list, update, search, and view PG details with public and private views.
+
+✔️ Room Management
+Manage rooms under PGs including sharing type, rent, AC/Non-AC, and availability.
+
+✔️ Booking Management
+Users can book rooms, while PG owners can approve, check-in, vacate, or cancel bookings.
+
+✔️ Reviews & Ratings
+Users can add reviews after successful bookings and view PG-wise reviews.
+
+✔️ Amenities & Rules Management
+Owners can configure PG amenities and house rules dynamically.
+
+✔️ Admin Approval Flow
+Admins can approve or reject PG listings before they go live.
+
+✔️ User Profile Management
+Users can view and update profiles and securely change passwords.
+
+✔️ Robust Error Handling & Validation
+Consistent API responses with proper HTTP status codes and validation messages.
+
+✔️ API Documentation (Swagger UI)
+Integrated OpenAPI documentation for easy API exploration and testing.
+
+✔️ Docker Support
+Optional Dockerized setup for simplified deployment.
 🛠 Tech Stack
 | Layer      | Technology            |
 | ---------- | --------------------- |
