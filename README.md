@@ -39,6 +39,9 @@ Integrated OpenAPI documentation for easy API exploration and testing.
 
 ✔️ Docker Support
 Optional Dockerized setup for simplified deployment.
+
+
+
 🛠 Tech Stack
 | Layer      | Technology            |
 | ---------- | --------------------- |
@@ -52,26 +55,29 @@ Optional Dockerized setup for simplified deployment.
 
 
 
-Project Structure
 pg-finder-backend/
 ├── src/
 │   ├── main/
 │   │   ├── java/
-│   │   │   ├── config/            ← Security & Swagger config
-│   │   │   ├── controller/        ← REST controllers
-│   │   │   ├── service/           ← Business logic
-│   │   │   ├── repository/        ← Spring Data JPA repos
+│   │   │   ├── config/            ← Security, JWT & Swagger configuration
+│   │   │   ├── controller/        ← REST controllers (API layer)
+│   │   │   ├── service/           ← Business logic & use cases
+│   │   │   ├── repository/        ← Spring Data JPA repositories
 │   │   │   ├── model/             ← JPA entity models
-│   │   │   ├── dto/               ← Request/Response objects
-|   |   |   ├── specification/     ← filtering and sorting and pagination
-│   │   │   └── exception/         ← Custom error handling
-|   |   |   
+│   │   │   ├── dto/               ← Request / Response DTOs
+│   │   │   ├── specification/     ← Filtering, sorting & pagination logic
+│   │   │   └── exception/         ← Global & custom exception handling
+│   │   │
+│   │   └── PgFinderBackendApplication.java
+│   │
 │   └── resources/
-│       ├── application.yml        ← Configs (DB, JWT, etc.)
-│       └── db/                    ← SQL scripts (optional)
-├── Dockerfile
-├── pom.xml
-└── README.md
+│       ├── application.yml        ← Application configuration (DB, JWT, etc.)
+│       └── db/                    ← Database scripts (optional)
+│
+├── Dockerfile                     ← Docker configuration
+├── pom.xml                        ← Maven dependencies & build config
+└── README.md                      ← Project documentation
+
 
 🔐 Authentication
 
