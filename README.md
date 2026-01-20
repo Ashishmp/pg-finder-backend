@@ -1,3 +1,15 @@
+![Java](https://img.shields.io/badge/Java-17-orange)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.x-brightgreen)
+![Maven](https://img.shields.io/badge/Maven-Build-blue)
+![MySQL](https://img.shields.io/badge/Database-MySQL-blue)
+![JWT](https://img.shields.io/badge/Auth-JWT-red)
+![Swagger](https://img.shields.io/badge/API-Swagger-green)
+![Docker](https://img.shields.io/badge/Docker-Ready-blue)
+![License](https://img.shields.io/badge/License-MIT-lightgrey)
+
+
+
+
 📍 PG Finder Backend
 
 PG Finder Backend is a Java + Spring Boot REST API for a role-based PG (Paying Guest) accommodation platform — supporting Users, PG Owners, and Admins with secure authentication, listings, bookings, and reviews.
@@ -169,15 +181,21 @@ pg-finder-backend/
 
 
 
-🧪 How to Run
-🏁 Prerequisites
+## 🧪 How to Run the Application
 
-✔ Java 17+
-✔ Maven
-✔ MySQL instance
-✔ (Optional) Docker
+### 🏁 Prerequisites
 
-1. Clone the repo
+- Java **17+**
+- Maven
+- MySQL Database
+- Docker (optional)
+
+---
+
+  
+
+```bash
+1. Clone the Repository
 
 git clone https://github.com/Ashishmp/pg-finder-backend.git
 cd pg-finder-backend
@@ -217,7 +235,7 @@ docker run -p 8080:8080 pg-finder-backend
 After starting, access:
 http://localhost:8080/swagger-ui.html
 
-
+```
 
 📞 Contact
 
