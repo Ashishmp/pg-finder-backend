@@ -54,29 +54,30 @@ Optional Dockerized setup for simplified deployment.
 
 
 
-
+```text
 pg-finder-backend/
 ├── src/
-│   ├── main/
-│   │   ├── java/
-│   │   │   ├── config/            ← Security, JWT & Swagger configuration
-│   │   │   ├── controller/        ← REST controllers (API layer)
-│   │   │   ├── service/           ← Business logic & use cases
-│   │   │   ├── repository/        ← Spring Data JPA repositories
-│   │   │   ├── model/             ← JPA entity models
-│   │   │   ├── dto/               ← Request / Response DTOs
-│   │   │   ├── specification/     ← Filtering, sorting & pagination logic
-│   │   │   └── exception/         ← Global & custom exception handling
-│   │   │
-│   │   └── PgFinderBackendApplication.java
-│   │
-│   └── resources/
-│       ├── application.yml        ← Application configuration (DB, JWT, etc.)
-│       └── db/                    ← Database scripts (optional)
+│   └── main/
+│       ├── java/
+│       │   └── com/pgfinder/
+│       │       ├── config/            ← Security, JWT & Swagger configuration
+│       │       ├── controller/        ← REST controllers (API layer)
+│       │       ├── service/           ← Business logic & use cases
+│       │       ├── repository/        ← Spring Data JPA repositories
+│       │       ├── model/             ← JPA entity models
+│       │       ├── dto/               ← Request / Response DTOs
+│       │       ├── specification/     ← Filtering, sorting & pagination
+│       │       ├── exception/         ← Global & custom exception handling
+│       │       └── PgFinderBackendApplication.java
+│       │
+│       └── resources/
+│           ├── application.yml        ← Application configuration (DB, JWT, etc.)
+│           └── db/                    ← Database scripts (optional)
 │
-├── Dockerfile                     ← Docker configuration
-├── pom.xml                        ← Maven dependencies & build config
-└── README.md                      ← Project documentation
+├── Dockerfile                         ← Docker configuration
+├── pom.xml                            ← Maven dependencies & build configuration
+└── README.md                          ← Project documentation
+```
 
 
 🔐 Authentication
