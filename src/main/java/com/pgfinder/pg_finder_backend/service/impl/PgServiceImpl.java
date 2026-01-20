@@ -5,29 +5,37 @@ import com.pgfinder.pg_finder_backend.dto.request.UpdatePgRequest;
 import com.pgfinder.pg_finder_backend.dto.response.PgPrivateDetailResponse;
 import com.pgfinder.pg_finder_backend.dto.response.PgPublicDetailResponse;
 import com.pgfinder.pg_finder_backend.dto.response.PgResponse;
+import com.pgfinder.pg_finder_backend.entity.Amenity;
 import com.pgfinder.pg_finder_backend.entity.Pg;
 import com.pgfinder.pg_finder_backend.entity.User;
 import com.pgfinder.pg_finder_backend.enums.PgStatus;
 import com.pgfinder.pg_finder_backend.enums.Role;
 import com.pgfinder.pg_finder_backend.exception.BusinessException;
+import com.pgfinder.pg_finder_backend.repository.AmenityRepository;
 import com.pgfinder.pg_finder_backend.repository.PgRepository;
 import com.pgfinder.pg_finder_backend.repository.UserRepository;
 import com.pgfinder.pg_finder_backend.service.PgService;
 import jakarta.transaction.Transactional;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class PgServiceImpl implements PgService {
 
     private final PgRepository pgRepository;
     private final UserRepository userRepository;
+    private final AmenityRepository amenityRepository;
 
-    public PgServiceImpl(PgRepository pgRepository, UserRepository userRepository) {
+    public PgServiceImpl(PgRepository pgRepository, UserRepository userRepository, AmenityRepository amenityRepository, AmenityRepository amenityRepository1) {
         this.pgRepository = pgRepository;
         this.userRepository = userRepository;
+        this.amenityRepository = amenityRepository1;
+
     }
     // ----------------------------------------
     // ---------------- CREATE ----------------
@@ -225,6 +233,50 @@ public class PgServiceImpl implements PgService {
 
         pg.setStatus(PgStatus.REJECTED.name());
         return pgRepository.save(pg);
+    }
+    @Override
+    @Transactional
+    public void assignAmenities(Long pgId, List<Long> amenityIds) {
+
+        User owner = getCurrentUser();
+
+        Pg pg = pgRepository.findById(pgId)
+                .orElseThrow(() -> new RuntimeException("PG not found"));
+
+        if (!pg.getOwner().getId().equals(owner.getId())) {
+            throw new RuntimeException("You do not own this PG");
+        }
+
+        Set<Amenity> amenities =
+                new HashSet<>(amenityRepository.findAllById(amenityIds));
+
+        pg.setAmenities(amenities);
+        pgRepository.save(pg);
+    }
+
+    @Override
+    @Transactional
+    public void updateRules(Long pgId, String rules) {
+
+        User owner = getCurrentUser();
+
+        Pg pg = pgRepository.findById(pgId)
+                .orElseThrow(() -> new RuntimeException("PG not found"));
+
+        if (!pg.getOwner().getId().equals(owner.getId())) {
+            throw new RuntimeException("You do not own this PG");
+        }
+
+        pg.setRules(rules);
+        pgRepository.save(pg);
+    }
+    private User getCurrentUser() {
+        String email = SecurityContextHolder.getContext()
+                .getAuthentication()
+                .getName();
+
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
     }
 
 }

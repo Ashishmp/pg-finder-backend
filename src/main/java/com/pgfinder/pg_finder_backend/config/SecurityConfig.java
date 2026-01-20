@@ -79,6 +79,13 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/bookings/owner").hasRole("PG_OWNER")
                         .requestMatchers("/api/v1/bookings/**").authenticated()
 
+                        // ======================
+                        // Amenities APIs
+                        // ======================
+
+                        .requestMatchers("/api/amenities").permitAll()
+                        .requestMatchers(HttpMethod.PUT, "/api/pgs/*/amenities").hasRole("PG_OWNER")
+                        .requestMatchers(HttpMethod.PUT, "/api/pgs/*/rules").hasRole("PG_OWNER")
 
                         // ======================
                         // Everything else

@@ -29,5 +29,7 @@ public interface PgService {
     Pg approvePg(Long pgId);
 
     Pg rejectPg(Long pgId);
+    void assignAmenities(Long pgId, List<Long> amenityIds);
+    void updateRules(Long pgId, String rules);
 
 }

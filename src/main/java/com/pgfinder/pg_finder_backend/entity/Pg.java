@@ -2,10 +2,38 @@ package com.pgfinder.pg_finder_backend.entity;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "pgs")
 public class Pg {
+    public Set<Amenity> getAmenities() {
+        return amenities;
+    }
+
+    public void setAmenities(Set<Amenity> amenities) {
+        this.amenities = amenities;
+    }
+
+    public String getRules() {
+        return rules;
+    }
+
+    public void setRules(String rules) {
+        this.rules = rules;
+    }
+
+    @ManyToMany
+    @JoinTable(
+            name = "pg_amenities",
+            joinColumns = @JoinColumn(name = "pg_id"),
+            inverseJoinColumns = @JoinColumn(name = "amenity_id")
+    )
+    private Set<Amenity> amenities = new HashSet<>();
+
+    @Column(length = 1000)
+    private String rules;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
