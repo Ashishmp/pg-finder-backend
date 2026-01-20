@@ -2,13 +2,17 @@ package com.pgfinder.pg_finder_backend.controller;
 
 import com.pgfinder.pg_finder_backend.dto.common.ApiResponse;
 import com.pgfinder.pg_finder_backend.dto.request.CreatePgRequest;
+import com.pgfinder.pg_finder_backend.dto.request.PgSearchRequest;
 import com.pgfinder.pg_finder_backend.dto.request.UpdatePgRequest;
 import com.pgfinder.pg_finder_backend.dto.response.PgPrivateDetailResponse;
 import com.pgfinder.pg_finder_backend.dto.response.PgPublicDetailResponse;
 import com.pgfinder.pg_finder_backend.dto.response.PgResponse;
+import com.pgfinder.pg_finder_backend.entity.Pg;
+import com.pgfinder.pg_finder_backend.mapper.PgMapper;
 import com.pgfinder.pg_finder_backend.security.AuthUtil;
 import com.pgfinder.pg_finder_backend.service.PgService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -126,6 +130,30 @@ public class PgController {
                 new ApiResponse<>(true, "Your PG has been updated successfully", response)
         );
     }
+
+    // ========================
+    // Seach using filters
+    // ========================
+
+    @GetMapping("/search")
+    public ResponseEntity<ApiResponse<Page<PgResponse>>> searchPgs(
+            PgSearchRequest request
+    ) {
+
+        Page<Pg> page = pgService.searchPgs(request);
+
+        Page<PgResponse> response =
+                page.map(PgMapper::toResponse);
+
+        return ResponseEntity.ok(
+                new ApiResponse<>(
+                        true,
+                        "PGs fetched successfully",
+                        response
+                )
+        );
+    }
+
 }
 
 

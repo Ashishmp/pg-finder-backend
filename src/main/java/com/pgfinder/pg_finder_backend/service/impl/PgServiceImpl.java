@@ -1,6 +1,7 @@
 package com.pgfinder.pg_finder_backend.service.impl;
 
 import com.pgfinder.pg_finder_backend.dto.request.CreatePgRequest;
+import com.pgfinder.pg_finder_backend.dto.request.PgSearchRequest;
 import com.pgfinder.pg_finder_backend.dto.request.UpdatePgRequest;
 import com.pgfinder.pg_finder_backend.dto.response.PgPrivateDetailResponse;
 import com.pgfinder.pg_finder_backend.dto.response.PgPublicDetailResponse;
@@ -15,7 +16,12 @@ import com.pgfinder.pg_finder_backend.repository.AmenityRepository;
 import com.pgfinder.pg_finder_backend.repository.PgRepository;
 import com.pgfinder.pg_finder_backend.repository.UserRepository;
 import com.pgfinder.pg_finder_backend.service.PgService;
+import com.pgfinder.pg_finder_backend.specification.PgSpecification;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -277,6 +283,25 @@ public class PgServiceImpl implements PgService {
 
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
+    }
+    @Override
+    public Page<Pg> searchPgs(PgSearchRequest request) {
+
+        Sort sort = Sort.by(
+                Sort.Direction.valueOf(request.getDirection()),
+                request.getSortBy()
+        );
+
+        Pageable pageable = PageRequest.of(
+                request.getPage(),
+                request.getSize(),
+                sort
+        );
+
+        return pgRepository.findAll(
+                PgSpecification.withFilters(request),
+                pageable
+        );
     }
 
 }
