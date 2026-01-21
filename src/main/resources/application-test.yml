@@ -1,0 +1,14 @@
+# ===============================
+# Disable DB & JPA for CI
+# ===============================
+spring:
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+      - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
+
+# ===============================
+# Server
+# ===============================
+server:
+  port: 8080
