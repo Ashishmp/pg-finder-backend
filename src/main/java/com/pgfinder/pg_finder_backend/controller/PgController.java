@@ -8,6 +8,7 @@ import com.pgfinder.pg_finder_backend.dto.response.PgPrivateDetailResponse;
 import com.pgfinder.pg_finder_backend.dto.response.PgPublicDetailResponse;
 import com.pgfinder.pg_finder_backend.dto.response.PgResponse;
 import com.pgfinder.pg_finder_backend.entity.Pg;
+import com.pgfinder.pg_finder_backend.enums.PgStatus;
 import com.pgfinder.pg_finder_backend.mapper.PgMapper;
 import com.pgfinder.pg_finder_backend.security.AuthUtil;
 import com.pgfinder.pg_finder_backend.service.PgService;
@@ -122,7 +123,7 @@ public class PgController {
     @PatchMapping("/{id}/status")
     public ResponseEntity<ApiResponse<PgResponse>> changePgStatus(
             @PathVariable Long id,
-            @RequestParam String status) {
+            @RequestParam PgStatus status) {
 
         Long userId = AuthUtil.getUserId();
         PgResponse response = pgService.updatePgStatus(id, status, userId);

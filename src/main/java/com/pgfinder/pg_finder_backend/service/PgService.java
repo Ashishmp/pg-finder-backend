@@ -7,6 +7,7 @@ import com.pgfinder.pg_finder_backend.dto.response.PgPrivateDetailResponse;
 import com.pgfinder.pg_finder_backend.dto.response.PgPublicDetailResponse;
 import com.pgfinder.pg_finder_backend.dto.response.PgResponse;
 import com.pgfinder.pg_finder_backend.entity.Pg;
+import com.pgfinder.pg_finder_backend.enums.PgStatus;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
@@ -25,7 +26,7 @@ public interface PgService {
 
     void deletePg(Long pgId, Long userId);
 
-    PgResponse updatePgStatus(Long pgId, String status, Long userId);
+    PgResponse updatePgStatus(Long pgId, PgStatus status, Long userId);
     List<Pg> getPendingPgs();
 
     Pg approvePg(Long pgId);

@@ -36,7 +36,7 @@ public class OwnerServiceImpl implements OwnerService {
         r.setPgName(pg.getPgName());
         r.setPgCity(pg.getPgCity());
         r.setPgState(pg.getPgState());
-        r.setStatus(pg.getStatus());
+        r.setStatus(pg.getStatus().name());
         r.setContactNumber(pg.getContactNumber());
         r.setDescription(pg.getDescription());
         r.setPgAddress(pg.getPgAddress());

@@ -1,5 +1,6 @@
 package com.pgfinder.pg_finder_backend.entity;
 
+import com.pgfinder.pg_finder_backend.enums.PgStatus;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -67,16 +68,26 @@ public class Pg {
     @JoinColumn(name = "owner_id", nullable = false)
     private User owner;
 
-    @Column(nullable = false)
-    private String status;   // ACTIVE, PAUSED, DELETED
+    public PgStatus getStatus() {
+        return status;
+    }
 
+    public void setStatus(PgStatus status) {
+        this.status = status;
+    }
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private PgStatus status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
     @PrePersist
     public void onCreate() {
         createdAt = LocalDateTime.now();
-        status = "ACTIVE";
+        if (status == null) {
+            status = PgStatus.PENDING;
+        }
     }
 
     @PreUpdate
@@ -165,13 +176,13 @@ public class Pg {
         this.owner = owner;
     }
 
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
+//    public String getStatus() {
+//        return status;
+//    }
+//
+//    public void setStatus(String status) {
+//        this.status = status;
+//    }
 
     public LocalDateTime getCreatedAt() {
         return createdAt;

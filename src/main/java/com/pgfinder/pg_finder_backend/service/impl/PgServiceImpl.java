@@ -68,7 +68,7 @@ public class PgServiceImpl implements PgService {
         pg.setPgPostalCode(request.getPgPostalCode());
         pg.setContactNumber(request.getContactNumber());
         pg.setOwner(owner);
-        pg.setStatus(PgStatus.PENDING.name());
+        pg.setStatus(PgStatus.PENDING);
         pg.setCreatedAt(LocalDateTime.now());
         pg.setUpdatedAt(LocalDateTime.now());
 
@@ -81,7 +81,7 @@ public class PgServiceImpl implements PgService {
     @Override
     public List<PgPublicDetailResponse> getAllPgs() {
         return pgRepository.findAll().stream()
-                .filter(pg -> "ACTIVE".equals(pg.getStatus()))
+                .filter(pg -> pg.getStatus() == PgStatus.ACTIVE)
                 .map(this::mapToPublic)
                 .toList();
     }
@@ -91,9 +91,10 @@ public class PgServiceImpl implements PgService {
         Pg pg = pgRepository.findById(pgId)
                 .orElseThrow(() -> new BusinessException("PG not found"));
 
-        if (!"ACTIVE".equals(pg.getStatus())) {
+        if (pg.getStatus() != PgStatus.ACTIVE) {
             throw new BusinessException("PG not available");
         }
+
 
         return mapToPublic(pg);
     }
@@ -132,14 +133,14 @@ public class PgServiceImpl implements PgService {
     @Override
     public void deletePg(Long pgId, Long userId) {
         Pg pg = getPgForOwnerOrAdmin(pgId, userId);
-        pg.setStatus("DELETED");
+        pg.setStatus(PgStatus.PENDING);
         pgRepository.save(pg);
     }
 
     @Override
-    public PgResponse updatePgStatus(Long pgId, String status, Long userId) {
+    public PgResponse updatePgStatus(Long pgId, PgStatus status, Long userId) {
         Pg pg = getPgForOwnerOrAdmin(pgId, userId);
-        pg.setStatus(status.toUpperCase());
+        pg.setStatus(status);
         return mapToPgResponse(pgRepository.save(pg));
     }
     // ------------------------------------------
@@ -178,7 +179,7 @@ public class PgServiceImpl implements PgService {
         r.setPgName(pg.getPgName());
         r.setPgCity(pg.getPgCity());
         r.setPgState(pg.getPgState());
-        r.setStatus(pg.getStatus());
+        r.setStatus(pg.getStatus().name());
         return r;
     }
 
@@ -217,11 +218,11 @@ public class PgServiceImpl implements PgService {
         Pg pg = pgRepository.findById(pgId)
                 .orElseThrow(() -> new RuntimeException("PG not found"));
 
-        if (!pg.getStatus().equals(PgStatus.PENDING.name())) {
+        if (!pg.getStatus().equals(PgStatus.PENDING)) {
             throw new RuntimeException("Only pending PGs can be approved");
         }
 
-        pg.setStatus(PgStatus.ACTIVE.name());
+        pg.setStatus(PgStatus.ACTIVE);
         return pgRepository.save(pg);
     }
 
@@ -233,11 +234,11 @@ public class PgServiceImpl implements PgService {
         Pg pg = pgRepository.findById(pgId)
                 .orElseThrow(() -> new RuntimeException("PG not found"));
 
-        if (pg.getStatus() != PgStatus.PENDING.name()) {
+        if (pg.getStatus() != PgStatus.PENDING) {
             throw new RuntimeException("Only pending PGs can be rejected");
         }
 
-        pg.setStatus(PgStatus.REJECTED.name());
+        pg.setStatus(PgStatus.REJECTED);
         return pgRepository.save(pg);
     }
     @Override
