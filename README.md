@@ -237,11 +237,12 @@ http://localhost:8080/swagger-ui.html
 
 ```
 
-📞 Contact
+## 📞 Contact
 
-Ashish Ranjan – Software Engineer
-📧 Email: ashishranjanmp@gmail.com
-GitHub: https://github.com/Ashishmp
+**Ashish Ranjan** – Software Engineer  
+📧 **Email:** ashishranjanmp@gmail.com  
+📞 **Phone:** +91 7294075490  
+🐙 **GitHub:** https://github.com/Ashishmp  
 
 ❤️ Acknowledgements
 Thanks to the open-source community, Spring docs, and related learning resources.
