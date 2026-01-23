@@ -120,7 +120,12 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new BusinessException("User not found"));
 
         // Generate JWT
-        String jwt = jwtService.generateToken(user.getId(), user.getEmail());
+//        String jwt = jwtService.generateToken(user.getId(), user.getEmail());
+        String jwt = jwtService.generateToken(
+                user.getId(),
+                user.getEmail(),
+                user.getRole().name()
+        );
 
         // Remove old refresh tokens
 //        refreshTokenRepository.deleteByUserId(user.getId());

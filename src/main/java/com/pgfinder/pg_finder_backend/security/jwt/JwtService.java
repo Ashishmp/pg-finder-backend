@@ -24,11 +24,16 @@ public class JwtService {
     @Value("${jwt.expiration}")
     private Long expiration;
 
-    public String generateToken(Long userId, String email) {
-        Map<String, Object> claims = new HashMap<String, Object>();
+    public String generateToken(Long userId, String email, String role) {
+        Map<String, Object> claims = new HashMap<>();
         claims.put("userId", userId);
-        return  createToken(claims, email);
+        claims.put("role", role);
+        return createToken(claims, email);
     }
+    public String extractRole(String token) {
+        return extractClaim(token, claims -> claims.get("role", String.class));
+    }
+
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }

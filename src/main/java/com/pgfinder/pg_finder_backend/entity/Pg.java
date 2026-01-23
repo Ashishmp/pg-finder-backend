@@ -68,26 +68,18 @@ public class Pg {
     @JoinColumn(name = "owner_id", nullable = false)
     private User owner;
 
-    public PgStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(PgStatus status) {
-        this.status = status;
-    }
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private PgStatus status;
+   // ACTIVE, PAUSED, DELETED
+
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
     @PrePersist
     public void onCreate() {
         createdAt = LocalDateTime.now();
-        if (status == null) {
-            status = PgStatus.PENDING;
-        }
+        status = PgStatus.PENDING;
     }
 
     @PreUpdate
@@ -176,13 +168,14 @@ public class Pg {
         this.owner = owner;
     }
 
-//    public String getStatus() {
-//        return status;
-//    }
-//
-//    public void setStatus(String status) {
-//        this.status = status;
-//    }
+    public PgStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(PgStatus status) {
+        this.status = status;
+    }
+
 
     public LocalDateTime getCreatedAt() {
         return createdAt;

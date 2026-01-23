@@ -94,6 +94,11 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "/api/pgs/*/rules").hasRole("OWNER")
 
                         // ======================
+                        // Analytics APIs
+                        // ======================
+                        .requestMatchers("/api/v1/analytics/owner/**").hasRole("PG_OWNER")
+
+                        // ======================
                         // Everything else
                         // ======================
                         .anyRequest().authenticated()

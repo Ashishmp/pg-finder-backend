@@ -13,5 +13,6 @@ public interface PgRepository extends JpaRepository<Pg, Long>, JpaSpecificationE
     List<Pg> findByOwnerId(Long ownerId);
     Optional<Pg> findByIdAndOwnerId(Long pgId, Long ownerId);
     List<Pg> findByStatus(PgStatus status);
+    long countByOwnerId(Long ownerId);
 
 }

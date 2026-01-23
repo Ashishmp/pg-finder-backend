@@ -15,7 +15,7 @@ public class PgMapper {
         dto.setPgCity(pg.getPgCity());
         dto.setPgState(pg.getPgState());
         dto.setDescription(pg.getDescription());
-        dto.setStatus(pg.getStatus().toString());
+        dto.setStatus(pg.getStatus().name());
         return dto;
     }
 

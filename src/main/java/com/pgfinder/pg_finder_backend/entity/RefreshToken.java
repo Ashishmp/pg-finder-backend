@@ -36,3 +36,28 @@ public class RefreshToken {
         this.id = id;
     }
 }
+
+
+
+//{
+//        "name": "Admin",
+//        "email": "admin@test.com",
+//        "password": "Admin@1234",
+//        "phone": "9000000003"
+//        }
+
+
+
+//{
+//        "name": "PG Owner",
+//        "email": "owner@test.com",
+//        "password": "Owner@1234",
+//        "phone": "9000000002"
+//        }
+//
+//{
+//        "name": "Normal User",
+//        "email": "user@test.com",
+//        "password": "User@1234",
+//        "phone": "9000000001"
+//        }
