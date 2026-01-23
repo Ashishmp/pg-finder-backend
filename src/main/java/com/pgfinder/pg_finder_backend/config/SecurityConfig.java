@@ -13,6 +13,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
 
 @Configuration
 public class SecurityConfig {
@@ -25,11 +30,12 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-
         http
+                .cors(cors -> {})
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
 
                 .authorizeHttpRequests(auth -> auth
 
@@ -58,14 +64,14 @@ public class SecurityConfig {
                         // ======================
                         // Room Management (OWNER only)
                         // ======================
-                        .requestMatchers(HttpMethod.POST, "/api/v1/pgs/*/rooms").hasRole("PG_OWNER")
-                        .requestMatchers(HttpMethod.PUT, "/api/v1/rooms/**").hasRole("PG_OWNER")
-                        .requestMatchers(HttpMethod.DELETE, "/api/v1/rooms/**").hasRole("PG_OWNER")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/pgs/*/rooms").hasRole("OWNER")
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/rooms/**").hasRole("OWNER")
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/rooms/**").hasRole("OWNER")
 
                         // ======================
                         // Owner APIs
                         // ======================
-                        .requestMatchers("/api/v1/owners/**").hasRole("PG_OWNER")
+                        .requestMatchers("/api/v1/owners/**").hasRole("OWNER")
 
                         // ======================
                         // Admin APIs
@@ -76,7 +82,7 @@ public class SecurityConfig {
                         //Booking APIs
                         // ======================
                         .requestMatchers("/api/v1/bookings/me").hasRole("USER")
-                        .requestMatchers("/api/v1/bookings/owner").hasRole("PG_OWNER")
+                        .requestMatchers("/api/v1/bookings/owner").hasRole("OWNER")
                         .requestMatchers("/api/v1/bookings/**").authenticated()
 
                         // ======================
@@ -84,8 +90,8 @@ public class SecurityConfig {
                         // ======================
 
                         .requestMatchers("/api/amenities").permitAll()
-                        .requestMatchers(HttpMethod.PUT, "/api/pgs/*/amenities").hasRole("PG_OWNER")
-                        .requestMatchers(HttpMethod.PUT, "/api/pgs/*/rules").hasRole("PG_OWNER")
+                        .requestMatchers(HttpMethod.PUT, "/api/pgs/*/amenities").hasRole("OWNER")
+                        .requestMatchers(HttpMethod.PUT, "/api/pgs/*/rules").hasRole("OWNER")
 
                         // ======================
                         // Everything else
@@ -123,4 +129,30 @@ public class SecurityConfig {
                 "/swagger-ui.html"
         );
     }
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+
+        configuration.setAllowedOrigins(List.of(
+                "http://localhost:3000",   // React local
+                "http://localhost:5173"    // Vite
+        ));
+
+        configuration.setAllowedMethods(List.of(
+                "GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"
+        ));
+
+        configuration.setAllowedHeaders(List.of(
+                "Authorization", "Content-Type"
+        ));
+
+        configuration.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source =
+                new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+
+        return source;
+    }
+
 }
