@@ -46,6 +46,11 @@ public class SecurityConfig {
                                 "/api/v1/auth/register",
                                 "/api/v1/auth/login"
                         ).permitAll()
+                        // ======================
+                        // Public Health Check
+                        // ======================
+
+                        .requestMatchers("/api/public/health-check").permitAll()
 
                         // ======================
                         // Swagger (Public)
@@ -96,7 +101,7 @@ public class SecurityConfig {
                         // ======================
                         // Analytics APIs
                         // ======================
-                        .requestMatchers("/api/v1/analytics/owner/**").hasRole("PG_OWNER")
+                        .requestMatchers("/api/v1/analytics/owner/**").hasRole("OWNER")
 
                         // ======================
                         // Everything else

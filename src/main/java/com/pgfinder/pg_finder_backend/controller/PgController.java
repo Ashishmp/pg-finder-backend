@@ -77,11 +77,15 @@ public class PgController {
     // ========================
 
     @GetMapping("/{id}/full")
-    public ResponseEntity<ApiResponse<PgPrivateDetailResponse>> getPrivatePg(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<PgPrivateDetailResponse>> getPrivatePg(
+            @PathVariable Long id) {
+
         Long userId = AuthUtil.getUserId();
-        PgPrivateDetailResponse pgs = pgService.getPrivatePgById(userId, id);
+        PgPrivateDetailResponse pgs =
+                pgService.getPrivatePgById(id, userId);
+
         return ResponseEntity.ok(
-                new ApiResponse<>(true, " PG fetched successfully with contact details", pgs)
+                new ApiResponse<>(true, "PG fetched successfully with contact details", pgs)
         );
     }
 
@@ -120,17 +124,17 @@ public class PgController {
     // Owner or Admin – Activate / Pause PG
     // ========================
 
-    @PatchMapping("/{id}/status")
-    public ResponseEntity<ApiResponse<PgResponse>> changePgStatus(
-            @PathVariable Long id,
-            @RequestParam PgStatus status) {
-
-        Long userId = AuthUtil.getUserId();
-        PgResponse response = pgService.updatePgStatus(id, status, userId);
-        return ResponseEntity.ok(
-                new ApiResponse<>(true, "Your PG has been updated successfully", response)
-        );
-    }
+//    @PatchMapping("/{id}/status")
+//    public ResponseEntity<ApiResponse<PgResponse>> changePgStatus(
+//            @PathVariable Long id,
+//            @RequestParam PgStatus status) {
+//
+//        Long userId = AuthUtil.getUserId();
+//        PgResponse response = pgService.updatePgStatus(id, status, userId);
+//        return ResponseEntity.ok(
+//                new ApiResponse<>(true, "Your PG has been updated successfully", response)
+//        );
+//    }
 
     // ========================
     // Seach using filters

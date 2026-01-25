@@ -2,18 +2,18 @@ package com.pgfinder.pg_finder_backend.dto.response;
 
 public class UserProfileResponse {
 
-    private Long id;
+    private Long userId;
     private String name;
     private String email;
     private String phone;
     private String role;
 
-    public Long getId() {
-        return id;
+    public Long getUserId() {
+        return userId;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
     public String getName() {

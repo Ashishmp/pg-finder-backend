@@ -22,6 +22,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -40,7 +41,7 @@ public class PgServiceImpl implements PgService {
     public PgServiceImpl(PgRepository pgRepository, UserRepository userRepository, AmenityRepository amenityRepository, AmenityRepository amenityRepository1) {
         this.pgRepository = pgRepository;
         this.userRepository = userRepository;
-        this.amenityRepository = amenityRepository1;
+        this.amenityRepository = amenityRepository;
 
     }
     // ----------------------------------------
@@ -80,11 +81,12 @@ public class PgServiceImpl implements PgService {
 
     @Override
     public List<PgPublicDetailResponse> getAllPgs() {
-        return pgRepository.findAll().stream()
-                .filter(pg -> pg.getStatus() == PgStatus.ACTIVE)
+        return pgRepository.findByStatus(PgStatus.ACTIVE)
+                .stream()
                 .map(this::mapToPublic)
                 .toList();
     }
+
 
     @Override
     public PgPublicDetailResponse getPublicPgById(Long pgId) {
@@ -105,8 +107,11 @@ public class PgServiceImpl implements PgService {
     @Override
     public PgPrivateDetailResponse getPrivatePgById(Long pgId, Long userId) {
         Pg pg = pgRepository.findById(pgId)
-                .orElseThrow(() -> new BusinessException("PG not found"));
+                .orElseThrow(() -> new BusinessException("PG not found " + pgId));
 
+        if (!pg.getOwner().getId().equals(userId)) {
+            throw new AccessDeniedException("You are not allowed to view this PG");
+        }
         return mapToPrivate(pg);
     }
     // -----------------------------------------------
@@ -115,34 +120,51 @@ public class PgServiceImpl implements PgService {
 
     @Override
     public PgResponse updatePg(Long pgId, UpdatePgRequest request, Long userId) {
+
         Pg pg = getPgForOwner(pgId, userId);
 
-        pg.setPgName(request.getPgName());
-        pg.setPgAddress(request.getPgAddress());
-        pg.setDescription(request.getDescription());
-        pg.setPgCity(request.getPgCity());
-        pg.setPgState(request.getPgState());
-        pg.setPgCountry(request.getPgCountry());
-        pg.setPgPostalCode(request.getPgPostalCode());
-        pg.setContactNumber(request.getContactNumber());
+        if (request.getPgName() != null) pg.setPgName(request.getPgName());
+        if (request.getPgAddress() != null) pg.setPgAddress(request.getPgAddress());
+        if (request.getDescription() != null) pg.setDescription(request.getDescription());
+        if (request.getPgCity() != null) pg.setPgCity(request.getPgCity());
+        if (request.getPgState() != null) pg.setPgState(request.getPgState());
+        if (request.getPgCountry() != null) pg.setPgCountry(request.getPgCountry());
+        if (request.getPgPostalCode() != null) pg.setPgPostalCode(request.getPgPostalCode());
+        if (request.getContactNumber() != null) pg.setContactNumber(request.getContactNumber());
+
         pg.setUpdatedAt(LocalDateTime.now());
 
         return mapToPgResponse(pgRepository.save(pg));
     }
 
+
     @Override
     public void deletePg(Long pgId, Long userId) {
         Pg pg = getPgForOwnerOrAdmin(pgId, userId);
-        pg.setStatus(PgStatus.PENDING);
+        pg.setStatus(PgStatus.INACTIVE);
         pgRepository.save(pg);
     }
 
-    @Override
-    public PgResponse updatePgStatus(Long pgId, PgStatus status, Long userId) {
-        Pg pg = getPgForOwnerOrAdmin(pgId, userId);
-        pg.setStatus(status);
-        return mapToPgResponse(pgRepository.save(pg));
-    }
+//NO LONGER NEEDED AS OF NOW PG CAN BE DELETED AND ADDED BY OWNER ONLY
+
+
+//    @Override
+//    public PgResponse updatePgStatus(Long pgId, PgStatus status, Long userId) {
+//
+//        User user = userRepository.findById(userId)
+//                .orElseThrow(() -> new BusinessException("User not found"));
+//
+//        if (user.getRole() != Role.ADMIN) {
+//            throw new AccessDeniedException("Only admin can update PG status");
+//        }
+//
+//        Pg pg = pgRepository.findById(pgId)
+//                .orElseThrow(() -> new BusinessException("PG not found"));
+//
+//        pg.setStatus(status);
+//        return mapToPgResponse(pgRepository.save(pg));
+//    }
+
     // ------------------------------------------
     // ---------------- SECURITY ----------------
     // ------------------------------------------
@@ -216,13 +238,20 @@ public class PgServiceImpl implements PgService {
     public Pg approvePg(Long pgId) {
 
         Pg pg = pgRepository.findById(pgId)
-                .orElseThrow(() -> new RuntimeException("PG not found"));
+                .orElseThrow(() -> new BusinessException("PG not found"));
 
-        if (!pg.getStatus().equals(PgStatus.PENDING)) {
-            throw new RuntimeException("Only pending PGs can be approved");
+        if (pg.getStatus() != PgStatus.PENDING) {
+            throw new BusinessException("Only pending PGs can be approved");
         }
 
         pg.setStatus(PgStatus.ACTIVE);
+
+        User owner = pg.getOwner();
+        if (owner.getRole() == Role.USER) {
+            owner.setRole(Role.OWNER);
+            userRepository.save(owner);
+        }
+
         return pgRepository.save(pg);
     }
 
@@ -288,15 +317,25 @@ public class PgServiceImpl implements PgService {
     @Override
     public Page<Pg> searchPgs(PgSearchRequest request) {
 
-        Sort sort = Sort.by(
-                Sort.Direction.valueOf(request.getDirection()),
-                request.getSortBy()
-        );
+        int page = request.getPage() >= 0 ? request.getPage() : 0;
+        int size = request.getSize() > 0 ? request.getSize() : 10;
+
+        size = Math.min(size, 50);
+
+        Sort.Direction direction =
+                request.getDirection() != null
+                        ? Sort.Direction.fromString(request.getDirection())
+                        : Sort.Direction.ASC;
+
+        String sortBy =
+                request.getSortBy() != null && !request.getSortBy().isBlank()
+                        ? request.getSortBy()
+                        : "createdAt";
 
         Pageable pageable = PageRequest.of(
-                request.getPage(),
-                request.getSize(),
-                sort
+                page,
+                size,
+                Sort.by(direction, sortBy)
         );
 
         return pgRepository.findAll(

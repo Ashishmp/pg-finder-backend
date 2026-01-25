@@ -26,7 +26,7 @@ public interface PgService {
 
     void deletePg(Long pgId, Long userId);
 
-    PgResponse updatePgStatus(Long pgId, PgStatus status, Long userId);
+//    PgResponse updatePgStatus(Long pgId, PgStatus status, Long userId);
     List<Pg> getPendingPgs();
 
     Pg approvePg(Long pgId);

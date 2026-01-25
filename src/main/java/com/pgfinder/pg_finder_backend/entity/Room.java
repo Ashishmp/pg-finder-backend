@@ -26,9 +26,10 @@ public class Room {
     private Double rent;
     private Integer totalBeds;
     private Integer availableBeds;
-    private Boolean isAc;
+    public Boolean isAc;
 
     private LocalDateTime createdAt;
+    private boolean ac;
 
     public RoomStatus getStatus() {
         return status;
@@ -108,5 +109,9 @@ public class Room {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public boolean isAc() {
+        return ac;
     }
 }
