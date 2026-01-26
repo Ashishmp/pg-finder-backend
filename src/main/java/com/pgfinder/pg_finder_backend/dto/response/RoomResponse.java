@@ -3,13 +3,22 @@ package com.pgfinder.pg_finder_backend.dto.response;
 public class RoomResponse {
     private Long roomId;
     private Double rent;
+    private Long pgId;
     private Integer sharingType;
     private Boolean ac;
     private Integer totalBeds;
     private Integer availableBeds;
     private String status;
-    private PgMiniResponse pg;
+//    private PgMiniResponse pg;
 
+
+    public Long getPgId() {
+        return pgId;
+    }
+
+    public void setPgId(Long pgId) {
+        this.pgId = pgId;
+    }
 
     public Long getRoomId() {
         return roomId;
@@ -67,12 +76,12 @@ public class RoomResponse {
         this.status = status;
     }
 
-    public PgMiniResponse getPg() {
-        return pg;
-    }
-
-    public void setPg(PgMiniResponse pg) {
-        this.pg = pg;
-    }
+//    public PgMiniResponse getPg() {
+//        return pg;
+//    }
+//
+//    public void setPg(PgMiniResponse pg) {
+//        this.pg = pg;
+//    }
 }
 

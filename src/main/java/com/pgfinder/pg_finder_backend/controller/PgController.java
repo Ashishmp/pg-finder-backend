@@ -4,6 +4,7 @@ import com.pgfinder.pg_finder_backend.dto.common.ApiResponse;
 import com.pgfinder.pg_finder_backend.dto.request.CreatePgRequest;
 import com.pgfinder.pg_finder_backend.dto.request.PgSearchRequest;
 import com.pgfinder.pg_finder_backend.dto.request.UpdatePgRequest;
+import com.pgfinder.pg_finder_backend.dto.response.PageResponse;
 import com.pgfinder.pg_finder_backend.dto.response.PgPrivateDetailResponse;
 import com.pgfinder.pg_finder_backend.dto.response.PgPublicDetailResponse;
 import com.pgfinder.pg_finder_backend.dto.response.PgResponse;
@@ -31,7 +32,7 @@ public class PgController {
     }
 
     // ========================
-    // Create PG (Logged-in USER becomes OWNER of this PG)
+    // Create PG
     // ========================
 
     @PostMapping
@@ -40,40 +41,43 @@ public class PgController {
 
         Long userId = AuthUtil.getUserId();
         PgResponse response = pgService.createPg(request, userId);
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(new ApiResponse<>(true, "Your PG has been created", response));
 
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(new ApiResponse<>(true, "Your PG has been created", response));
     }
 
     // ========================
-    // Public – List all PGs (no contact numbers)
+    // Public – List all PGs
     // ========================
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<PgPublicDetailResponse>>> getAllPgs() {
-        List<PgPublicDetailResponse> pgs = pgService.getAllPgs();
+
         return ResponseEntity.ok(
-                new ApiResponse<>(true,"List all Pgs",pgs)
+                new ApiResponse<>(true,
+                        "PGs fetched successfully",
+                        pgService.getAllPgs())
         );
     }
 
     // ========================
-    // Public – View PG details (no contact)
+    // Public – View PG
     // ========================
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<PgPublicDetailResponse>> getPublicPg(@PathVariable Long id) {
-
-        PgPublicDetailResponse pg = pgService.getPublicPgById(id);
+    public ResponseEntity<ApiResponse<PgPublicDetailResponse>> getPublicPg(
+            @PathVariable Long id) {
 
         return ResponseEntity.ok(
-                new ApiResponse<>(true, "Basic PG datails fetched successfully", pg)
+                new ApiResponse<>(
+                        true,
+                        "Basic PG details fetched successfully",
+                        pgService.getPublicPgById(id))
         );
     }
 
     // ========================
-    // Private – View PG with contact (JWT required)
+    // Private – View PG with contact
     // ========================
 
     @GetMapping("/{id}/full")
@@ -81,16 +85,17 @@ public class PgController {
             @PathVariable Long id) {
 
         Long userId = AuthUtil.getUserId();
-        PgPrivateDetailResponse pgs =
-                pgService.getPrivatePgById(id, userId);
 
         return ResponseEntity.ok(
-                new ApiResponse<>(true, "PG fetched successfully with contact details", pgs)
+                new ApiResponse<>(
+                        true,
+                        "PG fetched successfully with contact details",
+                        pgService.getPrivatePgById(id, userId))
         );
     }
 
     // ========================
-    // Owner-only – Update PG
+    // Owner – Update PG
     // ========================
 
     @PutMapping("/{id}")
@@ -99,14 +104,17 @@ public class PgController {
             @Valid @RequestBody UpdatePgRequest request) {
 
         Long userId = AuthUtil.getUserId();
-        PgResponse response = pgService.updatePg(id, request, userId);
+
         return ResponseEntity.ok(
-                new ApiResponse<>(true, "Your PG has been updated successfully", response)
+                new ApiResponse<>(
+                        true,
+                        "Your PG has been updated successfully",
+                        pgService.updatePg(id, request, userId))
         );
     }
 
     // ========================
-    // Owner or Admin – Soft delete PG
+    // Owner/Admin – Delete PG
     // ========================
 
     @DeleteMapping("/{id}")
@@ -121,49 +129,18 @@ public class PgController {
     }
 
     // ========================
-    // Owner or Admin – Activate / Pause PG
-    // ========================
-
-//    @PatchMapping("/{id}/status")
-//    public ResponseEntity<ApiResponse<PgResponse>> changePgStatus(
-//            @PathVariable Long id,
-//            @RequestParam PgStatus status) {
-//
-//        Long userId = AuthUtil.getUserId();
-//        PgResponse response = pgService.updatePgStatus(id, status, userId);
-//        return ResponseEntity.ok(
-//                new ApiResponse<>(true, "Your PG has been updated successfully", response)
-//        );
-//    }
-
-    // ========================
-    // Seach using filters
+    // Search PGs
     // ========================
 
     @GetMapping("/search")
-    public ResponseEntity<ApiResponse<Page<PgResponse>>> searchPgs(
-            PgSearchRequest request
-    ) {
-
-        Page<Pg> page = pgService.searchPgs(request);
-
-        Page<PgResponse> response =
-                page.map(PgMapper::toResponse);
+    public ResponseEntity<ApiResponse<PageResponse<PgResponse>>> searchPgs(
+            @ModelAttribute PgSearchRequest request) {
 
         return ResponseEntity.ok(
                 new ApiResponse<>(
                         true,
                         "PGs fetched successfully",
-                        response
-                )
+                        pgService.searchPgs(request))
         );
     }
-
 }
-
-
-//PG ADDRESS & LOCATION
-//API	Method	Role	Functionality
-///api/pgs/{pgId}/address	PUT	OWNER	Update location
-///api/pgs/cities	GET	ALL	List cities
-///api/pgs/areas	GET	ALL	Areas by city

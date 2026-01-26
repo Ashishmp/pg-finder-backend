@@ -2,7 +2,6 @@ package com.pgfinder.pg_finder_backend.controller;
 
 import com.pgfinder.pg_finder_backend.dto.common.ApiResponse;
 import com.pgfinder.pg_finder_backend.dto.response.PgResponse;
-import com.pgfinder.pg_finder_backend.mapper.PgMapper;
 import com.pgfinder.pg_finder_backend.service.PgService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -29,7 +28,7 @@ public class AdminPgController {
                 new ApiResponse<>(
                         true,
                         "Pending PGs fetched",
-                        PgMapper.toResponse(pgService.getPendingPgs())
+                        pgService.getPendingPgs()
                 )
         );
     }
@@ -44,7 +43,7 @@ public class AdminPgController {
                 new ApiResponse<>(
                         true,
                         "PG approved successfully",
-                        PgMapper.toResponse(pgService.approvePg(pgId))
+                        pgService.approvePg(pgId)
                 )
         );
     }
@@ -59,7 +58,7 @@ public class AdminPgController {
                 new ApiResponse<>(
                         true,
                         "PG rejected successfully",
-                        PgMapper.toResponse(pgService.rejectPg(pgId))
+                        pgService.rejectPg(pgId)
                 )
         );
     }

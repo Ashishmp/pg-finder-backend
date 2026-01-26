@@ -3,6 +3,7 @@ package com.pgfinder.pg_finder_backend.service.impl;
 import com.pgfinder.pg_finder_backend.dto.request.CreatePgRequest;
 import com.pgfinder.pg_finder_backend.dto.request.PgSearchRequest;
 import com.pgfinder.pg_finder_backend.dto.request.UpdatePgRequest;
+import com.pgfinder.pg_finder_backend.dto.response.PageResponse;
 import com.pgfinder.pg_finder_backend.dto.response.PgPrivateDetailResponse;
 import com.pgfinder.pg_finder_backend.dto.response.PgPublicDetailResponse;
 import com.pgfinder.pg_finder_backend.dto.response.PgResponse;
@@ -12,17 +13,17 @@ import com.pgfinder.pg_finder_backend.entity.User;
 import com.pgfinder.pg_finder_backend.enums.PgStatus;
 import com.pgfinder.pg_finder_backend.enums.Role;
 import com.pgfinder.pg_finder_backend.exception.BusinessException;
+import com.pgfinder.pg_finder_backend.mapper.PgMapper;
 import com.pgfinder.pg_finder_backend.repository.AmenityRepository;
 import com.pgfinder.pg_finder_backend.repository.PgRepository;
 import com.pgfinder.pg_finder_backend.repository.UserRepository;
 import com.pgfinder.pg_finder_backend.service.PgService;
 import com.pgfinder.pg_finder_backend.specification.PgSpecification;
 import jakarta.transaction.Transactional;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.*;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -32,21 +33,14 @@ import java.util.List;
 import java.util.Set;
 
 @Service
+@RequiredArgsConstructor
 public class PgServiceImpl implements PgService {
 
     private final PgRepository pgRepository;
     private final UserRepository userRepository;
     private final AmenityRepository amenityRepository;
 
-    public PgServiceImpl(PgRepository pgRepository, UserRepository userRepository, AmenityRepository amenityRepository, AmenityRepository amenityRepository1) {
-        this.pgRepository = pgRepository;
-        this.userRepository = userRepository;
-        this.amenityRepository = amenityRepository;
-
-    }
-    // ----------------------------------------
     // ---------------- CREATE ----------------
-    // ----------------------------------------
 
     @Override
     public PgResponse createPg(CreatePgRequest request, Long userId) {
@@ -73,8 +67,7 @@ public class PgServiceImpl implements PgService {
         pg.setCreatedAt(LocalDateTime.now());
         pg.setUpdatedAt(LocalDateTime.now());
 
-        Pg saved = pgRepository.save(pg);
-        return mapToPgResponse(saved);
+        return PgMapper.toResponse(pgRepository.save(pg));
     }
 
     // ---------------- PUBLIC ----------------
@@ -83,13 +76,13 @@ public class PgServiceImpl implements PgService {
     public List<PgPublicDetailResponse> getAllPgs() {
         return pgRepository.findByStatus(PgStatus.ACTIVE)
                 .stream()
-                .map(this::mapToPublic)
+                .map(PgMapper::toPublic)
                 .toList();
     }
 
-
     @Override
     public PgPublicDetailResponse getPublicPgById(Long pgId) {
+
         Pg pg = pgRepository.findById(pgId)
                 .orElseThrow(() -> new BusinessException("PG not found"));
 
@@ -97,152 +90,58 @@ public class PgServiceImpl implements PgService {
             throw new BusinessException("PG not available");
         }
 
-
-        return mapToPublic(pg);
+        return PgMapper.toPublic(pg);
     }
-    // -----------------------------------------
+
     // ---------------- PRIVATE ----------------
-    // -----------------------------------------
 
     @Override
     public PgPrivateDetailResponse getPrivatePgById(Long pgId, Long userId) {
+
         Pg pg = pgRepository.findById(pgId)
-                .orElseThrow(() -> new BusinessException("PG not found " + pgId));
+                .orElseThrow(() -> new BusinessException("PG not found"));
 
         if (!pg.getOwner().getId().equals(userId)) {
             throw new AccessDeniedException("You are not allowed to view this PG");
         }
-        return mapToPrivate(pg);
+
+        return PgMapper.toPrivate(pg);
     }
-    // -----------------------------------------------
+
     // ---------------- OWNER / ADMIN ----------------
-    // -----------------------------------------------
 
     @Override
     public PgResponse updatePg(Long pgId, UpdatePgRequest request, Long userId) {
 
         Pg pg = getPgForOwner(pgId, userId);
 
-        if (request.getPgName() != null) pg.setPgName(request.getPgName());
-        if (request.getPgAddress() != null) pg.setPgAddress(request.getPgAddress());
-        if (request.getDescription() != null) pg.setDescription(request.getDescription());
-        if (request.getPgCity() != null) pg.setPgCity(request.getPgCity());
-        if (request.getPgState() != null) pg.setPgState(request.getPgState());
-        if (request.getPgCountry() != null) pg.setPgCountry(request.getPgCountry());
-        if (request.getPgPostalCode() != null) pg.setPgPostalCode(request.getPgPostalCode());
-        if (request.getContactNumber() != null) pg.setContactNumber(request.getContactNumber());
-
+        PgMapper.updatePgFromRequest(pg, request);
         pg.setUpdatedAt(LocalDateTime.now());
 
-        return mapToPgResponse(pgRepository.save(pg));
+        return PgMapper.toResponse(pgRepository.save(pg));
     }
-
 
     @Override
     public void deletePg(Long pgId, Long userId) {
+
         Pg pg = getPgForOwnerOrAdmin(pgId, userId);
         pg.setStatus(PgStatus.INACTIVE);
         pgRepository.save(pg);
     }
 
-//NO LONGER NEEDED AS OF NOW PG CAN BE DELETED AND ADDED BY OWNER ONLY
-
-
-//    @Override
-//    public PgResponse updatePgStatus(Long pgId, PgStatus status, Long userId) {
-//
-//        User user = userRepository.findById(userId)
-//                .orElseThrow(() -> new BusinessException("User not found"));
-//
-//        if (user.getRole() != Role.ADMIN) {
-//            throw new AccessDeniedException("Only admin can update PG status");
-//        }
-//
-//        Pg pg = pgRepository.findById(pgId)
-//                .orElseThrow(() -> new BusinessException("PG not found"));
-//
-//        pg.setStatus(status);
-//        return mapToPgResponse(pgRepository.save(pg));
-//    }
-
-    // ------------------------------------------
-    // ---------------- SECURITY ----------------
-    // ------------------------------------------
-
-    private Pg getPgForOwner(Long pgId, Long userId) {
-        Pg pg = pgRepository.findById(pgId)
-                .orElseThrow(() -> new BusinessException("PG not found"));
-
-        if (!pg.getOwner().getId().equals(userId)) {
-            throw new BusinessException("You do not own this PG");
-        }
-        return pg;
-    }
-
-    private Pg getPgForOwnerOrAdmin(Long pgId, Long userId) {
-        Pg pg = pgRepository.findById(pgId)
-                .orElseThrow(() -> new BusinessException("PG not found"));
-
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new BusinessException("User not found"));
-
-        if (!pg.getOwner().getId().equals(userId) && user.getRole() != Role.ADMIN) {
-            throw new BusinessException("Unauthorized");
-        }
-        return pg;
-    }
-    // ---------------------------------------------
-    // ---------------- DTO MAPPERS ----------------
-    // ---------------------------------------------
-
-    private PgResponse mapToPgResponse(Pg pg) {
-        PgResponse r = new PgResponse();
-        r.setPgId(pg.getId());
-        r.setPgName(pg.getPgName());
-        r.setPgCity(pg.getPgCity());
-        r.setPgState(pg.getPgState());
-        r.setStatus(pg.getStatus().name());
-        return r;
-    }
-
-    private PgPublicDetailResponse mapToPublic(Pg pg) {
-        PgPublicDetailResponse r = new PgPublicDetailResponse();
-        r.setPgId(pg.getId());
-        r.setPgName(pg.getPgName());
-        r.setPgCity(pg.getPgCity());
-        r.setPgState(pg.getPgState());
-        r.setDescription(pg.getDescription());
-        return r;
-    }
-
-    private PgPrivateDetailResponse mapToPrivate(Pg pg) {
-        PgPrivateDetailResponse r = new PgPrivateDetailResponse();
-        r.setPgId(pg.getId());
-        r.setPgName(pg.getPgName());
-        r.setPgAddress(pg.getPgAddress());
-        r.setPgCity(pg.getPgCity());
-        r.setPgState(pg.getPgState());
-        r.setPgCountry(pg.getPgCountry());
-        r.setPgPostalCode(pg.getPgPostalCode());
-        r.setDescription(pg.getDescription());
-        r.setContactNumber(pg.getContactNumber());
-        return r;
-    }
     @Override
-    public List<Pg> getPendingPgs() {
-        return pgRepository.findByStatus(PgStatus.PENDING);
+    public List<PgResponse> getPendingPgs() {
+        return pgRepository.findByStatus(PgStatus.PENDING)
+                .stream()
+                .map(PgMapper::toResponse)
+                .toList();
     }
 
     @Override
     @Transactional
-    public Pg approvePg(Long pgId) {
+    public PgResponse approvePg(Long pgId) {
 
-        Pg pg = pgRepository.findById(pgId)
-                .orElseThrow(() -> new BusinessException("PG not found"));
-
-        if (pg.getStatus() != PgStatus.PENDING) {
-            throw new BusinessException("Only pending PGs can be approved");
-        }
+        Pg pg = getPendingPg(pgId);
 
         pg.setStatus(PgStatus.ACTIVE);
 
@@ -252,36 +151,26 @@ public class PgServiceImpl implements PgService {
             userRepository.save(owner);
         }
 
-        return pgRepository.save(pg);
+        return PgMapper.toResponse(pgRepository.save(pg));
     }
-
 
     @Override
     @Transactional
-    public Pg rejectPg(Long pgId) {
+    public PgResponse rejectPg(Long pgId) {
 
-        Pg pg = pgRepository.findById(pgId)
-                .orElseThrow(() -> new RuntimeException("PG not found"));
-
-        if (pg.getStatus() != PgStatus.PENDING) {
-            throw new RuntimeException("Only pending PGs can be rejected");
-        }
-
+        Pg pg = getPendingPg(pgId);
         pg.setStatus(PgStatus.REJECTED);
-        return pgRepository.save(pg);
+
+        return PgMapper.toResponse(pgRepository.save(pg));
     }
+
+    // ---------------- AMENITIES / RULES ----------------
+
     @Override
     @Transactional
     public void assignAmenities(Long pgId, List<Long> amenityIds) {
 
-        User owner = getCurrentUser();
-
-        Pg pg = pgRepository.findById(pgId)
-                .orElseThrow(() -> new RuntimeException("PG not found"));
-
-        if (!pg.getOwner().getId().equals(owner.getId())) {
-            throw new RuntimeException("You do not own this PG");
-        }
+        Pg pg = getPgForOwner(pgId, getCurrentUser().getId());
 
         Set<Amenity> amenities =
                 new HashSet<>(amenityRepository.findAllById(amenityIds));
@@ -294,54 +183,86 @@ public class PgServiceImpl implements PgService {
     @Transactional
     public void updateRules(Long pgId, String rules) {
 
-        User owner = getCurrentUser();
-
-        Pg pg = pgRepository.findById(pgId)
-                .orElseThrow(() -> new RuntimeException("PG not found"));
-
-        if (!pg.getOwner().getId().equals(owner.getId())) {
-            throw new RuntimeException("You do not own this PG");
-        }
-
+        Pg pg = getPgForOwner(pgId, getCurrentUser().getId());
         pg.setRules(rules);
         pgRepository.save(pg);
     }
-    private User getCurrentUser() {
-        String email = SecurityContextHolder.getContext()
-                .getAuthentication()
-                .getName();
 
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-    }
+    // ---------------- SEARCH ----------------
+
     @Override
-    public Page<Pg> searchPgs(PgSearchRequest request) {
+    public PageResponse<PgResponse> searchPgs(PgSearchRequest request) {
 
-        int page = request.getPage() >= 0 ? request.getPage() : 0;
-        int size = request.getSize() > 0 ? request.getSize() : 10;
-
-        size = Math.min(size, 50);
+        int page = Math.max(request.getPage(), 0);
+        int size = Math.min(Math.max(request.getSize(), 10), 50);
 
         Sort.Direction direction =
                 request.getDirection() != null
                         ? Sort.Direction.fromString(request.getDirection())
                         : Sort.Direction.ASC;
 
-        String sortBy =
-                request.getSortBy() != null && !request.getSortBy().isBlank()
-                        ? request.getSortBy()
-                        : "createdAt";
+        Set<String> allowedSortFields = Set.of("createdAt", "pgName", "pgCity");
+        String sortBy = allowedSortFields.contains(request.getSortBy())
+                ? request.getSortBy()
+                : "createdAt";
 
-        Pageable pageable = PageRequest.of(
-                page,
-                size,
-                Sort.by(direction, sortBy)
-        );
+        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
 
-        return pgRepository.findAll(
+        Page<Pg> pgPage = pgRepository.findAll(
                 PgSpecification.withFilters(request),
                 pageable
         );
+
+        return PageResponse.from(pgPage.map(PgMapper::toResponse));
     }
 
+    // ---------------- HELPERS ----------------
+
+    private Pg getPgForOwner(Long pgId, Long userId) {
+
+        Pg pg = pgRepository.findById(pgId)
+                .orElseThrow(() -> new BusinessException("PG not found"));
+
+        if (!pg.getOwner().getId().equals(userId)) {
+            throw new BusinessException("You do not own this PG");
+        }
+        return pg;
+    }
+
+    private Pg getPgForOwnerOrAdmin(Long pgId, Long userId) {
+
+        Pg pg = pgRepository.findById(pgId)
+                .orElseThrow(() -> new BusinessException("PG not found"));
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException("User not found"));
+
+        if (!pg.getOwner().getId().equals(userId) && user.getRole() != Role.ADMIN) {
+            throw new BusinessException("Unauthorized");
+        }
+        return pg;
+    }
+
+    private Pg getPendingPg(Long pgId) {
+
+        Pg pg = pgRepository.findById(pgId)
+                .orElseThrow(() -> new BusinessException("PG not found"));
+
+        if (pg.getStatus() != PgStatus.PENDING) {
+            throw new BusinessException("Only pending PGs allowed");
+        }
+        return pg;
+    }
+
+    private User getCurrentUser() {
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        if (auth == null || !auth.isAuthenticated()) {
+            throw new AccessDeniedException("Unauthorized");
+        }
+
+        return userRepository.findByEmail(auth.getName())
+                .orElseThrow(() -> new BusinessException("User not found"));
+    }
 }

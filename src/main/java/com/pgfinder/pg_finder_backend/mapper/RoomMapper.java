@@ -12,7 +12,9 @@ public class RoomMapper {
     public static RoomResponse toResponse(Room room) {
 
         RoomResponse r = new RoomResponse();
+        Pg pg = room.getPg();
         r.setRoomId(room.getId());
+        r.setPgId(pg.getId());
         r.setRent(room.getRent());
         r.setSharingType(room.getSharingType());
         r.setAc(room.isAc());
@@ -20,14 +22,14 @@ public class RoomMapper {
         r.setAvailableBeds(room.getAvailableBeds());
         r.setStatus(room.getStatus().name());
 
-        Pg pg = room.getPg();
-        PgMiniResponse pgDto = new PgMiniResponse();
-        pgDto.setPgId(pg.getId());
-        pgDto.setPgName(pg.getPgName());
-        pgDto.setPgCity(pg.getPgCity());
-        pgDto.setPgState(pg.getPgState());
-
-        r.setPg(pgDto);
+//        Pg pg = room.getPg();
+//        PgMiniResponse pgDto = new PgMiniResponse();
+//        pgDto.setPgId(pg.getId());
+//        pgDto.setPgName(pg.getPgName());
+//        pgDto.setPgCity(pg.getPgCity());
+//        pgDto.setPgState(pg.getPgState());
+//
+//        r.setPg(pgDto);
 
         return r;
     }

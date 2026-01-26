@@ -3,6 +3,7 @@ package com.pgfinder.pg_finder_backend.service;
 import com.pgfinder.pg_finder_backend.dto.request.CreatePgRequest;
 import com.pgfinder.pg_finder_backend.dto.request.PgSearchRequest;
 import com.pgfinder.pg_finder_backend.dto.request.UpdatePgRequest;
+import com.pgfinder.pg_finder_backend.dto.response.PageResponse;
 import com.pgfinder.pg_finder_backend.dto.response.PgPrivateDetailResponse;
 import com.pgfinder.pg_finder_backend.dto.response.PgPublicDetailResponse;
 import com.pgfinder.pg_finder_backend.dto.response.PgResponse;
@@ -26,15 +27,15 @@ public interface PgService {
 
     void deletePg(Long pgId, Long userId);
 
-//    PgResponse updatePgStatus(Long pgId, PgStatus status, Long userId);
-    List<Pg> getPendingPgs();
+    List<PgResponse> getPendingPgs();
 
-    Pg approvePg(Long pgId);
+    PgResponse approvePg(Long pgId);
 
-    Pg rejectPg(Long pgId);
+    PgResponse rejectPg(Long pgId);
+
     void assignAmenities(Long pgId, List<Long> amenityIds);
+
     void updateRules(Long pgId, String rules);
-    Page<Pg> searchPgs(PgSearchRequest request);
 
-
+    PageResponse<PgResponse> searchPgs(PgSearchRequest request);
 }
