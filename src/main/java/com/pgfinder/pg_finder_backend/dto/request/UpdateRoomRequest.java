@@ -4,9 +4,6 @@ public class UpdateRoomRequest {
     private Integer rent;
     private Integer totalBeds;
     private Boolean ac;
-
-
-
     private Integer sharingType;
 
 
