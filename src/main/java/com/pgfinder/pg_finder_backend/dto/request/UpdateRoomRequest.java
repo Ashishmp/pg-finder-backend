@@ -3,8 +3,8 @@ package com.pgfinder.pg_finder_backend.dto.request;
 public class UpdateRoomRequest {
     private Integer rent;
     private Integer totalBeds;
-    private Boolean ac;
-    private Integer sharingType;
+//    private Boolean ac;
+//    private Integer sharingType;
 
 
     public Integer getRent() {
@@ -23,19 +23,20 @@ public class UpdateRoomRequest {
         this.totalBeds = totalBeds;
     }
 
-    public Boolean getAc() {
-        return ac;
-    }
-
-    public void setAc(Boolean ac) {
-        this.ac = ac;
-    }
-
-    public Integer getSharingType() {
-        return sharingType;
-    }
-
-    public void setSharingType(Integer sharingType) {
-        this.sharingType = sharingType;
-    }
+//    public Boolean getAc() {
+//        return ac;
+//    }
+//
+//    public void setAc(Boolean ac) {
+//        this.ac = ac;
+//    }
+//
+//    public Integer getSharingType() {
+//        return sharingType;
+//    }
+//
+//    public void setSharingType(Integer sharingType) {
+//        this.sharingType = sharingType;
+//    }
+//}
 }

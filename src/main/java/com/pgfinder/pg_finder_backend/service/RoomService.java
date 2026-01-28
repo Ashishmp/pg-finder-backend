@@ -2,17 +2,27 @@ package com.pgfinder.pg_finder_backend.service;
 
 import com.pgfinder.pg_finder_backend.dto.request.CreateRoomRequest;
 import com.pgfinder.pg_finder_backend.dto.request.UpdateRoomRequest;
-import com.pgfinder.pg_finder_backend.entity.Room;
-
-import java.util.List;
+import com.pgfinder.pg_finder_backend.dto.response.PageResponse;
+import com.pgfinder.pg_finder_backend.dto.response.RoomResponse;
 
 public interface RoomService {
 
-    Room createRoom(Long pgId, CreateRoomRequest request);
+    RoomResponse createRoom(Long pgId, CreateRoomRequest request);
 
-    List<Room> getRoomsForPublicOrOwner(Long pgId);
+    PageResponse<RoomResponse> getRoomsByPg(
+            Long pgId,
+            int page,
+            int size,
+            String sortBy,
+            String direction,
+            Integer sharingType,
+            Boolean ac,
+            String status,
+            Integer minRent,
+            Integer maxRent
+    );
 
-    Room updateRoom(Long roomId, UpdateRoomRequest roomRequest);
+    RoomResponse updateRoom(Long roomId, UpdateRoomRequest request);
 
-    void disableRoom(Long roomId);
+    void deleteRoom(Long roomId);
 }

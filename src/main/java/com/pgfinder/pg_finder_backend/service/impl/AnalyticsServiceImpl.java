@@ -2,10 +2,7 @@ package com.pgfinder.pg_finder_backend.service.impl;
 
 import com.pgfinder.pg_finder_backend.dto.response.OwnerAnalyticsResponse;
 import com.pgfinder.pg_finder_backend.entity.User;
-import com.pgfinder.pg_finder_backend.repository.BookingRepository;
-import com.pgfinder.pg_finder_backend.repository.PgRepository;
-import com.pgfinder.pg_finder_backend.repository.RoomRepository;
-import com.pgfinder.pg_finder_backend.repository.UserRepository;
+import com.pgfinder.pg_finder_backend.repository.*;
 import com.pgfinder.pg_finder_backend.service.AnalyticsService;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -15,18 +12,18 @@ import org.springframework.stereotype.Service;
     public class AnalyticsServiceImpl implements AnalyticsService {
 
         private final PgRepository pgRepository;
-        private final RoomRepository roomRepository;
+        private final RoomAnalyticsRepository roomAnalyticsRepository;
         private final BookingRepository bookingRepository;
         private final UserRepository userRepository;
 
         public AnalyticsServiceImpl(
                 PgRepository pgRepository,
-                RoomRepository roomRepository,
+                RoomAnalyticsRepository roomAnalyticsRepository,
                 BookingRepository bookingRepository,
                 UserRepository userRepository) {
 
             this.pgRepository = pgRepository;
-            this.roomRepository = roomRepository;
+            this.roomAnalyticsRepository = roomAnalyticsRepository;
             this.bookingRepository = bookingRepository;
             this.userRepository = userRepository;
         }
@@ -46,8 +43,8 @@ import org.springframework.stereotype.Service;
             User owner = getCurrentUser();
 
             long totalPgs = pgRepository.countByOwnerId(owner.getId());
-            long totalRooms = roomRepository.countByPg_Owner_Id(owner.getId());
-            long totalBeds = roomRepository.totalBeds(owner.getId());
+            long totalRooms = roomAnalyticsRepository.countByPgOwnerId(owner.getId());
+            long totalBeds = roomAnalyticsRepository.totalBeds(owner.getId());
             long occupiedBeds = bookingRepository.countActiveBookings(owner.getId());
             double revenue = bookingRepository.totalRevenue(owner.getId());
 

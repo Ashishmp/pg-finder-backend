@@ -21,7 +21,8 @@ public class Room {
     @ManyToOne
     @JoinColumn(name = "pg_id")
     private Pg pg;
-
+    @Version
+    private Long version;
     private Integer sharingType; // 1,2,3
     private Double rent;
     private Integer totalBeds;
