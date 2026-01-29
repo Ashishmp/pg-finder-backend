@@ -1,12 +1,15 @@
 CREATE TABLE payments (
-                          id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                          id BIGSERIAL PRIMARY KEY,
 
                           booking_id BIGINT NOT NULL,
 
-                          amount DOUBLE NOT NULL,
-                          payment_mode VARCHAR(50),
+                          amount DOUBLE PRECISION NOT NULL,
+
+                          payment_mode VARCHAR(50) NOT NULL,
+
                           status VARCHAR(30) NOT NULL,
-                          transaction_ref VARCHAR(100),
+
+                          transaction_ref VARCHAR(100) UNIQUE,
 
                           created_at TIMESTAMP NOT NULL,
 

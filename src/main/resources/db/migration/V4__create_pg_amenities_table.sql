@@ -10,3 +10,4 @@ CREATE TABLE pg_amenities (
                               CONSTRAINT fk_pg_amenities_amenity
                                   FOREIGN KEY (amenity_id) REFERENCES amenities(id) ON DELETE CASCADE
 );
+

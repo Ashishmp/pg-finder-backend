@@ -6,45 +6,61 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "bookings")
+@Table(
+        name = "bookings",
+        indexes = {
+                @Index(name = "idx_booking_user", columnList = "user_id"),
+                @Index(name = "idx_booking_pg", columnList = "pg_id"),
+                @Index(name = "idx_booking_room", columnList = "room_id")
+        }
+)
 public class Booking {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Who booked
-    @ManyToOne
+    // ---------------- Relations ----------------
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    // Which PG
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "pg_id", nullable = false)
     private Pg pg;
 
-    // Which room type
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "room_id", nullable = false)
     private Room room;
 
+    // ---------------- Booking Details ----------------
+
+    @Column(name = "start_date", nullable = false)
     private LocalDate startDate;
+
+    @Column(name = "end_date", nullable = false)
     private LocalDate endDate;
 
+    @Column(nullable = false)
     private Double price;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private BookingStatus status;
 
+    // ---------------- Audit ----------------
+
+    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
     @PrePersist
     public void onCreate() {
         createdAt = LocalDateTime.now();
-        status = BookingStatus.PENDING;   // User just requested
+        status = BookingStatus.PENDING;
     }
 
-    // ================= getters & setters =================
+    // ---------------- Getters & Setters ----------------
 
     public Long getId() { return id; }
 

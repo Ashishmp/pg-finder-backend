@@ -9,21 +9,51 @@ import java.util.Set;
 @Entity
 @Table(name = "pgs")
 public class Pg {
-    public Set<Amenity> getAmenities() {
-        return amenities;
-    }
 
-    public void setAmenities(Set<Amenity> amenities) {
-        this.amenities = amenities;
-    }
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    public String getRules() {
-        return rules;
-    }
+    @Column(name = "pg_name", nullable = false, length = 200)
+    private String pgName;
 
-    public void setRules(String rules) {
-        this.rules = rules;
-    }
+    @Column(name = "pg_address", nullable = false, length = 300)
+    private String pgAddress;
+
+    @Column(name = "pg_city", nullable = false, length = 100)
+    private String pgCity;
+
+    @Column(name = "pg_state", nullable = false, length = 100)
+    private String pgState;
+
+    @Column(name = "pg_country", nullable = false, length = 100)
+    private String pgCountry;
+
+    @Column(name = "pg_postal_code", nullable = false, length = 20)
+    private String pgPostalCode;
+
+    @Column(length = 1000)
+    private String description;
+
+    @Column(name = "contact_number", nullable = false, length = 20)
+    private String contactNumber;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner_id", nullable = false)
+    private User owner;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 30)
+    private PgStatus status;
+
+    @Column(name = "average_rating", nullable = false)
+    private Double averageRating = 0.0;
+
+    @Column(name = "total_reviews", nullable = false)
+    private Integer totalReviews = 0;
+
+    @Column(name = "rules", columnDefinition = "TEXT")
+    private String rules;
 
     @ManyToMany
     @JoinTable(
@@ -33,67 +63,20 @@ public class Pg {
     )
     private Set<Amenity> amenities = new HashSet<>();
 
-    @Column(length = 1000)
-    private String rules;
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(nullable = false)
-    private String pgName;
-
-    @Column(nullable = false)
-    private String pgAddress;
-
-    @Column(nullable = false)
-    private String pgCity;
-
-    @Column(nullable = false)
-    private String pgState;
-
-    @Column(nullable = false)
-    private String pgCountry;
-
-    @Column(nullable = false)
-    private String pgPostalCode;
-
-    private String description;
-
-    @Column(nullable = false)
-    private String contactNumber;
-
-    // 🔐 OWNER OF THIS PG
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "owner_id", nullable = false)
-    private User owner;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private PgStatus status;
-   // ACTIVE, PAUSED, DELETED
-
+    @Column(name = "created_at", insertable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @PrePersist
-    public void onCreate() {
-        createdAt = LocalDateTime.now();
-        status = PgStatus.PENDING;
-    }
-
-    @PreUpdate
-    public void onUpdate() {
-        updatedAt = LocalDateTime.now();
-    }
-    private Double averageRating = 0.0;
-    private Integer totalReviews = 0;
-
-
-    // ---------- Getters & Setters ----------
+    // getters & setters only
 
     public Long getId() {
         return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getPgName() {
@@ -176,26 +159,6 @@ public class Pg {
         this.status = status;
     }
 
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public Double getAverageRating() {
         return averageRating;
     }
@@ -210,5 +173,37 @@ public class Pg {
 
     public void setTotalReviews(Integer totalReviews) {
         this.totalReviews = totalReviews;
+    }
+
+    public String getRules() {
+        return rules;
+    }
+
+    public void setRules(String rules) {
+        this.rules = rules;
+    }
+
+    public Set<Amenity> getAmenities() {
+        return amenities;
+    }
+
+    public void setAmenities(Set<Amenity> amenities) {
+        this.amenities = amenities;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
     }
 }

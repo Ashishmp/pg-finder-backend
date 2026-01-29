@@ -1,10 +1,10 @@
 CREATE TABLE rooms (
-                       id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                       id BIGSERIAL PRIMARY KEY,
 
                        pg_id BIGINT NOT NULL,
 
-                       sharing_type INT NOT NULL,      -- 1,2,3
-                       rent DOUBLE NOT NULL,
+                       sharing_type INT NOT NULL,
+                       rent DOUBLE PRECISION NOT NULL,
 
                        total_beds INT NOT NULL,
                        available_beds INT NOT NULL,
@@ -18,8 +18,9 @@ CREATE TABLE rooms (
                        created_at TIMESTAMP NOT NULL,
 
                        CONSTRAINT fk_room_pg
-                           FOREIGN KEY (pg_id) REFERENCES pgs(id),
+                           FOREIGN KEY (pg_id) REFERENCES pgs(id) ON DELETE CASCADE,
 
                        CONSTRAINT uq_room_pg_sharing_ac
                            UNIQUE (pg_id, sharing_type, is_ac)
 );
+

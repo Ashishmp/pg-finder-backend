@@ -1,3 +1,4 @@
+
 package com.pgfinder.pg_finder_backend.entity;
 
 import com.pgfinder.pg_finder_backend.enums.RoomStatus;

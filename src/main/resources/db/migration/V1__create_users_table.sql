@@ -1,19 +1,17 @@
 CREATE TABLE users (
-                       id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                       id BIGSERIAL PRIMARY KEY,
 
-                       name VARCHAR(100) NOT NULL,
-
-                       email VARCHAR(150) NOT NULL UNIQUE,
-
-                       password VARCHAR(255) NOT NULL,
-
-                       phone VARCHAR(20) NOT NULL UNIQUE,
+                       name VARCHAR(150) NOT NULL,
+                       email VARCHAR(150) NOT NULL,
+                       password TEXT NOT NULL,
+                       phone VARCHAR(20) NOT NULL,
 
                        role VARCHAR(30) NOT NULL,
 
-                       status VARCHAR(20) NOT NULL,
+                       created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                       updated_at TIMESTAMP,
+                       last_login_at TIMESTAMP,
 
-                       created_at TIMESTAMP NOT NULL,
-                       updated_at TIMESTAMP NULL,
-                       last_login_at TIMESTAMP NULL
+                       CONSTRAINT uq_users_email UNIQUE (email),
+                       CONSTRAINT uq_users_phone UNIQUE (phone)
 );

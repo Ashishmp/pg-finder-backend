@@ -1,5 +1,5 @@
 CREATE TABLE bookings (
-                          id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                          id BIGSERIAL PRIMARY KEY,
 
                           user_id BIGINT NOT NULL,
                           pg_id BIGINT NOT NULL,
@@ -8,9 +8,10 @@ CREATE TABLE bookings (
                           start_date DATE NOT NULL,
                           end_date DATE NOT NULL,
 
-                          price DOUBLE,
+                          price DOUBLE PRECISION NOT NULL,
 
                           status VARCHAR(30) NOT NULL,
+
                           created_at TIMESTAMP NOT NULL,
 
                           CONSTRAINT fk_booking_user
@@ -22,3 +23,7 @@ CREATE TABLE bookings (
                           CONSTRAINT fk_booking_room
                               FOREIGN KEY (room_id) REFERENCES rooms(id)
 );
+
+CREATE INDEX idx_booking_user ON bookings(user_id);
+CREATE INDEX idx_booking_pg ON bookings(pg_id);
+CREATE INDEX idx_booking_room ON bookings(room_id);
