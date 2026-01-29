@@ -1,0 +1,40 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: pgfinder-postgres
+    environment:
+      POSTGRES_DB: pgfinder
+      POSTGRES_USER: pguser
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgfinder_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pguser -d pgfinder"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build: .
+    container_name: pgfinder-backend
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/pgfinder
+      DB_USER: pguser
+      DB_PASSWORD: password
+      DRIVER_CLASS_NAME: org.postgresql.Driver
+      HIBERNATE_DIALECT: org.hibernate.dialect.PostgreSQLDialect
+      JWT_SECRET: VGhpcy1pcy1hLXNlY3VyZS0yNTYtYml0LWp3dC1zZWNyZXQ=
+      JWT_EXPIRATION: 86400000
+    restart: unless-stopped
+
+volumes:
+  pgfinder_data:
