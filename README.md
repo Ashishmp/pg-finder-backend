@@ -58,7 +58,7 @@ Optional Dockerized setup for simplified deployment.
 | Layer      | Technology            |
 | ---------- | --------------------- |
 | Backend    | Java, Spring Boot     |
-| Database   | MySQL (JPA/Hibernate) |
+| Database   | postgre (JPA/Hibernate) |
 | Security   | Spring Security, JWT  |
 | API Docs   | Swagger / OpenAPI     |
 | Build Tool | Maven                 |
