@@ -17,52 +17,45 @@ PG Finder Backend is a Java + Spring Boot REST API for a role-based PG (Paying G
 This backend service powers the PG Finder ecosystem and is designed for scalability, clean architecture, and real-world usage with JWT security and MySQL persistence.
 
 🚀 Features
-🛠 Core Functionality
 
-✔️ Authentication & Authorization
-Role-based access using JWT tokens (User, PG Owner, Admin).
+🔐 JWT Authentication & Role-Based Authorization
 
-✔️ PG Listings
-Create, list, update, search, and view PG details with public and private views.
+🏘️ PG & Room Management
 
-✔️ Room Management
-Manage rooms under PGs including sharing type, rent, AC/Non-AC, and availability.
+🔎 Advanced PG Search with filters
 
-✔️ Booking Management
-Users can book rooms, while PG owners can approve, check-in, vacate, or cancel bookings.
+📅 Booking Management (User & Owner views)
 
-✔️ Reviews & Ratings
-Users can add reviews after successful bookings and view PG-wise reviews.
+⭐ Reviews & Ratings
 
-✔️ Amenities & Rules Management
-Owners can configure PG amenities and house rules dynamically.
+📊 Owner Analytics Dashboard
 
-✔️ Admin Approval Flow
-Admins can approve or reject PG listings before they go live.
+💳 Payment Simulation (Admin-only)
 
-✔️ User Profile Management
-Users can view and update profiles and securely change passwords.
+🐳 Dockerized Setup (Backend + PostgreSQL)
 
-✔️ Robust Error Handling & Validation
-Consistent API responses with proper HTTP status codes and validation messages.
-
-✔️ API Documentation (Swagger UI)
-Integrated OpenAPI documentation for easy API exploration and testing.
-
-✔️ Docker Support
-Optional Dockerized setup for simplified deployment.
+📄 Swagger API Documentation
 
 
 
 🛠 Tech Stack
-| Layer      | Technology            |
-| ---------- | --------------------- |
-| Backend    | Java, Spring Boot     |
-| Database   | postgre (JPA/Hibernate) |
-| Security   | Spring Security, JWT  |
-| API Docs   | Swagger / OpenAPI     |
-| Build Tool | Maven                 |
-| Deployment | Docker                |
+| Layer      | Technology                  |
+| ---------- | --------------------------- |
+| Backend    | Spring Boot 4, Java 17      |
+| Security   | Spring Security, JWT        |
+| Database   | PostgreSQL 15               |
+| ORM        | Hibernate, JPA              |
+| Build Tool | Maven                       |
+| Containers | Docker, Docker Compose      |
+| Docs       | Swagger (Springdoc OpenAPI) |
+
+
+👥 Roles & Permissions
+| Role  | Description                                         |
+| ----- | --------------------------------------------------- |
+| USER  | Search PGs, book rooms, view bookings               |
+| OWNER | Manage PGs & rooms, view owner bookings & analytics |
+| ADMIN | Approve PGs, simulate payments, platform control    |
 
 
 
@@ -212,53 +205,42 @@ Payment (Simulation)
 
 
 
-## 🧪 How to Run the Application
-
-### 🏁 Prerequisites
+🐳 Running with Docker (Recommended)
+Prerequisites
 
 Docker
 Docker Compose
-
----
-
-```bash
-
-
-1. Clone the Repository
-
+```
+Steps
 git clone https://github.com/Ashishmp/pg-finder-backend.git
 cd pg-finder-backend
-
-2. Configure environment
-Create application.yml (or .env) with:
-take reference as used in repo
-
-
-
-3. Run with Maven
-
-mvn clean install
-mvn spring-boot:run
-
-
-
-🐳 Docker (Recommanded)
-
-Build:
 docker compose up --build
-
-Stop Containers
-docker compose down
-
-
-
-📄 API Docs (Swagger)
-
-After starting, access:
-http://localhost:8080/swagger-ui.html
-
 ```
 
+Backend will be available at:
+```
+http://localhost:8080
+```
+
+PostgreSQL:
+```
+localhost:5432
+```
+▶️ Running Locally (Without Docker)
+
+Install PostgreSQL
+```
+Create database:
+
+CREATE DATABASE pgfinder;
+```
+
+Update application.yml
+
+Run:
+```
+mvn spring-boot:run
+```
 ## 📞 Contact
 
 **Ashish Ranjan** – Software Engineer  
