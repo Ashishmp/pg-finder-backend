@@ -20,6 +20,8 @@ spring:
     show-sql: true
     properties:
       hibernate:
+        jdbc:
+          time_zone: UTC
         format_sql: true
     database-platform: ${HIBERNATE_DIALECT}
 

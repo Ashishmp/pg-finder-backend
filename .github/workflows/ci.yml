@@ -8,8 +8,21 @@ on:
 
 jobs:
   build:
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: pgfinder
+          POSTGRES_USER: pguser
+          POSTGRES_PASSWORD: password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U pguser -d pgfinder"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -20,9 +33,12 @@ jobs:
           java-version: 17
           distribution: temurin
           cache: maven
-      - name: Build with Maven
-        run: mvn clean package -DskipTests
-
+      - name: Build & Test
+        env:
+          DB_URL: jdbc:postgresql://localhost:5432/pgfinder
+          DB_USER: pguser
+          DB_PASSWORD: password
+        run: mvn clean verify
       - name: Upload JAR artifact
         uses: actions/upload-artifact@v4
         with:

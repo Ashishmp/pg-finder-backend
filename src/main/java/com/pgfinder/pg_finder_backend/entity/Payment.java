@@ -32,6 +32,7 @@ public class Payment {
     @Column(nullable = false)
     private PaymentStatus status;
 
+
     @Column(name = "transaction_ref", unique = true)
     private String transactionRef;
 

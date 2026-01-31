@@ -28,10 +28,12 @@ public class Room {
     private Double rent;
     private Integer totalBeds;
     private Integer availableBeds;
-    public Boolean isAc;
+//    public Boolean isAc;
 
     private LocalDateTime createdAt;
-    private boolean ac;
+    @Column(name = "is_ac", nullable = false)
+    private Boolean ac;
+
 
     public RoomStatus getStatus() {
         return status;
@@ -96,13 +98,12 @@ public class Room {
     public void setAvailableBeds(Integer availableBeds) {
         this.availableBeds = availableBeds;
     }
-
     public Boolean getAc() {
-        return isAc;
+        return ac;
     }
 
     public void setAc(Boolean ac) {
-        isAc = ac;
+        this.ac = ac;
     }
 
     public LocalDateTime getCreatedAt() {
@@ -113,7 +114,4 @@ public class Room {
         this.createdAt = createdAt;
     }
 
-    public boolean isAc() {
-        return ac;
-    }
 }

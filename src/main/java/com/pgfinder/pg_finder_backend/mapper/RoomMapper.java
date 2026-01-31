@@ -17,7 +17,7 @@ public class RoomMapper {
         r.setPgId(pg.getId());
         r.setRent(room.getRent());
         r.setSharingType(room.getSharingType());
-        r.setAc(room.isAc());
+        r.setAc(room.getAc());
         r.setTotalBeds(room.getTotalBeds());
         r.setAvailableBeds(room.getAvailableBeds());
         r.setStatus(room.getStatus().name());
