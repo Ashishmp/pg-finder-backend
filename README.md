@@ -35,8 +35,10 @@ This backend service powers the PG Finder ecosystem and is designed for scalabil
 🐳 Dockerized Setup (Backend + PostgreSQL)
 
 📄 Swagger API Documentation
-
-
+```
+> All secured APIs require:
+> Authorization: Bearer <JWT_TOKEN>
+```
 
 🛠 Tech Stack
 | Layer      | Technology                  |
@@ -101,86 +103,96 @@ pg-finder-backend/
 ```
 
 
-🔐 Authentication
+🔐 Authentication & User
 
-| Method | Endpoint                | Description                 |
-| ------ | ----------------------- | --------------------------- |
-| POST   | `/api/v1/auth/register` | Register a new user         |
-| POST   | `/api/v1/auth/login`    | Login and receive JWT token |
-| POST   | `/api/v1/auth/logout`   | Logout user                 |
+| Method | Endpoint                   | Role                 | Description                |
+| ------ | -------------------------- | -------------------- | -------------------------- |
+| POST   | `/api/v1/auth/register`    | Public               | Register a new user        |
+| POST   | `/api/v1/auth/login`       | Public               | Login and get JWT          |
+| POST   | `/api/v1/auth/logout`      | Authenticated        | Logout user                |
+| PUT    | `/api/v1/auth/update/{id}` | Authenticated        | Update user details        |
+| GET    | `/api/users/me`            | USER / OWNER / ADMIN | Get logged-in user profile |
+| PUT    | `/api/users/me`            | USER / OWNER / ADMIN | Update profile             |
+| PATCH  | `/api/users/me/password`   | USER / OWNER / ADMIN | Change password            |
 
-👤 User Profile
-
-| Method | Endpoint                 | Description                   |
-| ------ | ------------------------ | ----------------------------- |
-| GET    | `/api/users/me`          | Get logged-in user profile    |
-| PUT    | `/api/users/me`          | Update logged-in user profile |
-| PATCH  | `/api/users/me/password` | Change account password       |
 
 🏠 PG Management
 
-| Method | Endpoint                  | Description                        |
-| ------ | ------------------------- | ---------------------------------- |
-| POST   | `/api/v1/pgs`             | Create a new PG (Owner)            |
-| GET    | `/api/v1/pgs`             | Get all PGs                        |
-| GET    | `/api/v1/pgs/{id}`        | Get PG by ID                       |
-| PUT    | `/api/v1/pgs/{id}`        | Update PG                          |
-| DELETE | `/api/v1/pgs/{id}`        | Delete PG                          |
-| PATCH  | `/api/v1/pgs/{id}/status` | Enable / Disable PG                |
-| GET    | `/api/v1/pgs/{id}/full`   | Get full PG details (private view) |
-| GET    | `/api/v1/pgs/search`      | Search PGs with filters            |
+| Method | Endpoint                | Role                 | Description             |
+| ------ | ----------------------- | -------------------- | ----------------------- |
+| GET    | `/api/v1/pgs`           | Public               | List all PGs            |
+| GET    | `/api/v1/pgs/{id}`      | Public               | Get PG basic details    |
+| GET    | `/api/v1/pgs/{id}/full` | USER / OWNER / ADMIN | Get full PG details     |
+| GET    | `/api/v1/pgs/search`    | Public               | Search PGs with filters |
+| POST   | `/api/v1/pgs`           | OWNER                | Create a new PG         |
+| PUT    | `/api/v1/pgs/{id}`      | OWNER                | Update PG               |
+| DELETE | `/api/v1/pgs/{id}`      | OWNER                | Delete PG               |
+
 
 🛏 Room Management
 
-| Method | Endpoint                   | Description     |
-| ------ | -------------------------- | --------------- |
-| POST   | `/api/v1/rooms/pgs/{pgId}` | Add room to PG  |
-| GET    | `/api/v1/rooms/pgs/{pgId}` | Get rooms by PG |
-| PUT    | `/api/v1/rooms/{roomId}`   | Update room     |
-| DELETE | `/api/v1/rooms/{roomId}`   | Delete room     |
+| Method | Endpoint                   | Role   | Description        |
+| ------ | -------------------------- | ------ | ------------------ |
+| GET    | `/api/v1/pgs/{pgId}/rooms` | Public | Get rooms for a PG |
+| POST   | `/api/v1/pgs/{pgId}/rooms` | OWNER  | Add room to PG     |
+| PUT    | `/api/v1/rooms/{roomId}`   | OWNER  | Update room        |
+| DELETE | `/api/v1/rooms/{roomId}`   | OWNER  | Delete room        |
+
 
 📅 Booking Management
 
-| Method | Endpoint                                | Description            |
-| ------ | --------------------------------------- | ---------------------- |
-| POST   | `/api/v1/bookings/rooms/{roomId}`       | Create booking         |
-| PUT    | `/api/v1/bookings/{bookingId}/approve`  | Approve booking        |
-| PUT    | `/api/v1/bookings/{bookingId}/check-in` | Check-in               |
-| PUT    | `/api/v1/bookings/{bookingId}/vacate`   | Vacate room            |
-| PUT    | `/api/v1/bookings/{bookingId}/cancel`   | Cancel booking         |
-| GET    | `/api/v1/bookings/me`                   | Get my bookings (User) |
-| GET    | `/api/v1/bookings/owner`                | Get owner bookings     |
+| Method | Endpoint                                | Role         | Description                  |
+| ------ | --------------------------------------- | ------------ | ---------------------------- |
+| POST   | `/api/v1/bookings/rooms/{roomId}`       | USER         | Create booking               |
+| GET    | `/api/v1/bookings/me`                   | USER         | Get my bookings              |
+| GET    | `/api/v1/bookings/owner`                | OWNER        | Get bookings for owner’s PGs |
+| PUT    | `/api/v1/bookings/{bookingId}/approve`  | OWNER        | Approve booking              |
+| PUT    | `/api/v1/bookings/{bookingId}/check-in` | OWNER        | Check-in booking             |
+| PUT    | `/api/v1/bookings/{bookingId}/vacate`   | OWNER        | Vacate booking               |
+| PUT    | `/api/v1/bookings/{bookingId}/cancel`   | USER / OWNER | Cancel booking               |
+
 
 ⭐ Reviews
 
-| Method | Endpoint                               | Description              |
-| ------ | -------------------------------------- | ------------------------ |
-| POST   | `/api/v1/reviews/bookings/{bookingId}` | Add review after booking |
-| GET    | `/api/v1/reviews/pgs/{pgId}`           | Get reviews for PG       |
-| DELETE | `/api/v1/reviews/{reviewId}`           | Delete review            |
+| Method | Endpoint                               | Role   | Description    |
+| ------ | -------------------------------------- | ------ | -------------- |
+| POST   | `/api/v1/reviews/bookings/{bookingId}` | USER   | Add review     |
+| GET    | `/api/v1/reviews/pgs/{pgId}`           | Public | Get PG reviews |
+| DELETE | `/api/v1/reviews/{reviewId}`           | USER   | Delete review  |
 
 🧑‍💼 Owner APIs
 
-| Method | Endpoint                       | Description               |
-| ------ | ------------------------------ | ------------------------- |
-| GET    | `/api/v1/owners/me/pgs`        | Get all PGs owned by user |
-| GET    | `/api/v1/owners/me/pgs/{pgId}` | Get specific owned PG     |
+| Method | Endpoint                       | Role  | Description           |
+| ------ | ------------------------------ | ----- | --------------------- |
+| GET    | `/api/v1/owners/me/pgs`        | OWNER | Get my PGs            |
+| GET    | `/api/v1/owners/me/pgs/{pgId}` | OWNER | Get specific owned PG |
 
-🛡 Admin – PG Approval
 
-| Method | Endpoint                           | Description              |
-| ------ | ---------------------------------- | ------------------------ |
-| GET    | `/api/v1/admin/pgs/pending`        | Get pending PG approvals |
-| PUT    | `/api/v1/admin/pgs/{pgId}/approve` | Approve PG               |
-| PUT    | `/api/v1/admin/pgs/{pgId}/reject`  | Reject PG                |
+📊 Analytics & Dashboard
+
+| Method | Endpoint                          | Role  | Description             |
+| ------ | --------------------------------- | ----- | ----------------------- |
+| GET    | `/api/v1/owner/dashboard/summary` | OWNER | Owner dashboard metrics |
+| GET    | `/api/v1/analytics/owner/summary` | OWNER | Owner analytics summary |
 
 🧰 Amenities & Rules
 
-| Method | Endpoint                    | Description         |
-| ------ | --------------------------- | ------------------- |
-| PUT    | `/api/pgs/{pgId}/amenities` | Update PG amenities |
-| PUT    | `/api/pgs/{pgId}/rules`     | Update PG rules     |
-| GET    | `/api/amenities`            | Get all amenities   |
+| Method | Endpoint                    | Role   | Description         |
+| ------ | --------------------------- | ------ | ------------------- |
+| GET    | `/api/amenities`            | Public | Get all amenities   |
+| PUT    | `/api/pgs/{pgId}/amenities` | OWNER  | Update PG amenities |
+| PUT    | `/api/pgs/{pgId}/rules`     | OWNER  | Update PG rules     |
+
+
+🛠️ Admin APIs
+
+| Method | Endpoint                           | Role  | Description     |
+| ------ | ---------------------------------- | ----- | --------------- |
+| GET    | `/api/v1/admin/pgs/pending`        | ADMIN | Get pending PGs |
+| PUT    | `/api/v1/admin/pgs/{pgId}/approve` | ADMIN | Approve PG      |
+| PUT    | `/api/v1/admin/pgs/{pgId}/reject`  | ADMIN | Reject PG       |
+
+
 
 ❤️ Health Check
 
@@ -188,18 +200,13 @@ pg-finder-backend/
 | ------ | -------------------------- | ------------------------ |
 | GET    | `/api/public/health-check` | Application health check |
 
-Owner Analytics API
 
-| API                                             | Access |
-| ----------------------------------------------- | ------ |
-| GET `/api/v1/analytics/owner/dashboard/summary` | OWNER  |
+💳 Payment Simulation
 
-Payment (Simulation)
+| Method | Endpoint                                | Role  | Description                         |
+| ------ | --------------------------------------- | ----- | ----------------------------------- |
+| POST   | `/api/v1/payments/{bookingId}/simulate` | ADMIN | Simulate payment (SUCCESS / FAILED) |
 
-| API                                      | Access |
-| ---------------------------------------- | ------ |
-| POST `/api/v1/payments/simulate/success` | ADMIN  |
-| POST `/api/v1/payments/simulate/failure` | ADMIN  |
 
 
 
