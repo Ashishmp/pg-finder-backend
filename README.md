@@ -71,23 +71,39 @@ pg-finder-backend/
 ├── src/
 │   └── main/
 │       ├── java/
-│       │   └── com/pgfinder/
-│       │       ├── config/            ← Security, JWT & Swagger configuration
-│       │       ├── controller/        ← REST controllers (API layer)
-│       │       ├── service/           ← Business logic & use cases
-│       │       ├── repository/        ← Spring Data JPA repositories
-│       │       ├── model/             ← JPA entity models
-│       │       ├── dto/               ← Request / Response DTOs
-│       │       ├── specification/     ← Filtering, sorting & pagination
-│       │       ├── exception/         ← Global & custom exception handling
+│       │   └── com/pgfinder/pg_finder_backend/
+│       │       ├── config/                 # Security, JWT, Swagger, CORS configs
+│       │       ├── controller/
+│       │       │   ├── auth/               # Login, register APIs
+│       │       │   ├── admin/              # Admin-only APIs
+│       │       │   ├── analytics/          # Owner analytics dashboard APIs
+│       │       │   ├── booking/            # Booking APIs
+│       │       │   ├── pg/                 # PG browsing & management APIs
+│       │       │   └── room/               # Room management APIs
+│       │       ├── service/
+│       │       │   ├── impl/               # Service implementations
+│       │       │   └── analytics/          # Analytics services
+│       │       ├── repository/
+│       │       │   └── analytics/          # Analytics custom repositories
+│       │       ├── entity/                 # JPA entities (User, Pg, Room, Booking, Payment, Review)
+│       │       ├── dto/
+│       │       │   ├── request/            # Request DTOs
+│       │       │   ├── response/           # Response DTOs
+│       │       │   └── analytics/           # Analytics DTOs
+│       │       ├── mapper/                 # Entity ↔ DTO mappers
+│       │       ├── exception/              # Global & custom exceptions
+│       │       ├── security/               # JWT, UserDetails, filters
 │       │       └── PgFinderBackendApplication.java
 │       │
 │       └── resources/
-│           ├── application.yml        ← Application configuration (DB, JWT, etc.)
-│           └── db/                    ← Database scripts (optional)
+│           ├── application.yml             # App configuration
+│           └── db/migration/               # Flyway migration scripts
 │
-├── Dockerfile                         ← Docker configuration
-├── pom.xml                            ← Maven dependencies & build configuration
+├── Dockerfile                            # Backend Docker image
+├── docker-compose.yml                    # App + PostgreSQL
+├── pom.xml                               # Maven build config
+└── README.md                             # Project documentation
+ configuration
 └── README.md                          ← Project documentation
 ```
 
@@ -179,22 +195,35 @@ pg-finder-backend/
 | ------ | -------------------------- | ------------------------ |
 | GET    | `/api/public/health-check` | Application health check |
 
+Owner Analytics API
+
+| API                                             | Access |
+| ----------------------------------------------- | ------ |
+| GET `/api/v1/analytics/owner/dashboard/summary` | OWNER  |
+
+Payment (Simulation)
+
+| API                                      | Access |
+| ---------------------------------------- | ------ |
+| POST `/api/v1/payments/simulate/success` | ADMIN  |
+| POST `/api/v1/payments/simulate/failure` | ADMIN  |
+
+
+
 
 
 ## 🧪 How to Run the Application
 
 ### 🏁 Prerequisites
 
-- Java **17+**
-- Maven
-- MySQL Database
-- Docker (optional)
+Docker
+Docker Compose
 
 ---
 
-  
-
 ```bash
+
+
 1. Clone the Repository
 
 git clone https://github.com/Ashishmp/pg-finder-backend.git
@@ -202,16 +231,9 @@ cd pg-finder-backend
 
 2. Configure environment
 Create application.yml (or .env) with:
+take reference as used in repo
 
-spring:
-  datasource:
-    url: jdbc:mysql://localhost:3306/pgfinder
-    username: your_db_user
-    password: your_db_pass
 
-jwt:
-  secret: your_jwt_secret
-  expiration_ms: 3600000
 
 3. Run with Maven
 
@@ -220,13 +242,13 @@ mvn spring-boot:run
 
 
 
-🐳 Docker
+🐳 Docker (Recommanded)
 
 Build:
-docker build -t pg-finder-backend .
+docker compose up --build
 
-Run:
-docker run -p 8080:8080 pg-finder-backend
+Stop Containers
+docker compose down
 
 
 
