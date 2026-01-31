@@ -6,7 +6,7 @@ CREATE TABLE bookings (
                           room_id BIGINT NOT NULL,
 
                           start_date DATE NOT NULL,
-                          end_date DATE NOT NULL,
+                          end_date DATE,
 
                           price DOUBLE PRECISION NOT NULL,
 

@@ -3,7 +3,9 @@ package com.pgfinder.pg_finder_backend.dto.response;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class PageResponse<T> {
 
     private List<T> items;

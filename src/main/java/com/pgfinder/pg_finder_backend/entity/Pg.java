@@ -3,7 +3,9 @@ package com.pgfinder.pg_finder_backend.entity;
 import com.pgfinder.pg_finder_backend.enums.PgStatus;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -68,6 +70,8 @@ public class Pg {
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+    @OneToMany(mappedBy = "pg", fetch = FetchType.LAZY)
+    private List<Room> rooms = new ArrayList<>();
 
     // getters & setters only
 
@@ -205,5 +209,13 @@ public class Pg {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public List<Room> getRooms() {
+        return rooms;
+    }
+
+    public void setRooms(List<Room> rooms) {
+        this.rooms = rooms;
     }
 }

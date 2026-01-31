@@ -1,5 +1,7 @@
 package com.pgfinder.pg_finder_backend.dto.response;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserResponse {
     public Long getId() {
         return id;

@@ -94,6 +94,14 @@ public class PgServiceImpl implements PgService {
     }
 
     // ---------------- PRIVATE ----------------
+//    @Override
+//    public PgPrivateDetailResponse getPrivatePgById(Long pgId) {
+//
+//        Pg pg = pgRepository.findById(pgId)
+//                .orElseThrow(() -> new BusinessException("PG not found"));
+//
+//        return PgMapper.toPrivate(pg);
+//    }
 
     @Override
     public PgPrivateDetailResponse getPrivatePgById(Long pgId, Long userId) {
@@ -101,9 +109,9 @@ public class PgServiceImpl implements PgService {
         Pg pg = pgRepository.findById(pgId)
                 .orElseThrow(() -> new BusinessException("PG not found"));
 
-        if (!pg.getOwner().getId().equals(userId)) {
-            throw new AccessDeniedException("You are not allowed to view this PG");
-        }
+//        if (!pg.getOwner().getId().equals(userId)) {
+//            throw new AccessDeniedException("You are not allowed to view this PG");
+//        }
 
         return PgMapper.toPrivate(pg);
     }

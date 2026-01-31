@@ -1,6 +1,11 @@
 services:
   postgres:
     image: postgres:15
+    command: >
+      postgres
+      -c shared_buffers=256MB
+      -c checkpoint_timeout=10min
+      -c max_wal_size=1GB
     container_name: pgfinder-postgres
     environment:
       POSTGRES_DB: pgfinder

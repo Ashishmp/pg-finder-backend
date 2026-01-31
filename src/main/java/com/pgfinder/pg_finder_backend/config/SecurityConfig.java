@@ -60,11 +60,25 @@ public class SecurityConfig {
                                 "/swagger-ui/**",
                                 "/swagger-ui.html"
                         ).permitAll()
+                        // ======================
+                        // Public PG & Room browsing
+                        // ======================
+
+                        // Full PG details (needs auth)
+                                .requestMatchers(HttpMethod.GET, "/api/v1/pgs/*/full")
+                                .hasAnyRole("USER", "OWNER", "ADMIN")
+
+
+                                // Public PG browsing
+                        .requestMatchers(HttpMethod.GET, "/api/v1/pgs/**")
+                        .permitAll()
 
                         // ======================
                         // Public PG & Room browsing
                         // ======================
-                        .requestMatchers(HttpMethod.GET, "/api/v1/pgs/**").permitAll()
+//                        .requestMatchers(HttpMethod.GET, "/api/v1/pgs/**").permitAll()
+//                        .requestMatchers(HttpMethod.GET, "/api/v1/pgs/*/full")
+//                        .hasAnyRole("USER", "OWNER", "ADMIN")
 
                         // ======================
                         // Room Management (OWNER only)
@@ -102,6 +116,13 @@ public class SecurityConfig {
                         // Analytics APIs
                         // ======================
                         .requestMatchers("/api/v1/analytics/owner/**").hasRole("OWNER")
+
+                        // =====================
+                        // Payment simultion
+                        // =====================
+
+                        .requestMatchers("/api/v1/payments/**")
+                        .hasRole("ADMIN")
 
                         // ======================
                         // Everything else
