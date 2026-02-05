@@ -1,8 +1,10 @@
 ![Java](https://img.shields.io/badge/Java-17-orange)
-![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.x-brightgreen)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.x-brightgreen)
 ![Maven](https://img.shields.io/badge/Maven-Build-blue)
-![MySQL](https://img.shields.io/badge/Database-MySQL-blue)
+![PostgreSQL](https://img.shields.io/badge/Database-PostgreSQL%2015-blue)
+![Redis](https://img.shields.io/badge/Cache-Redis-red)
 ![JWT](https://img.shields.io/badge/Auth-JWT-red)
+![Rate Limiting](https://img.shields.io/badge/Security-Rate%20Limiting-critical)
 ![Swagger](https://img.shields.io/badge/API-Swagger-green)
 ![Docker](https://img.shields.io/badge/Docker-Ready-blue)
 ![License](https://img.shields.io/badge/License-MIT-lightgrey)
@@ -14,42 +16,70 @@
 
 PG Finder Backend is a Java + Spring Boot REST API for a role-based PG (Paying Guest) accommodation platform — supporting Users, PG Owners, and Admins with secure authentication, listings, bookings, and reviews.
 
-This backend service powers the PG Finder ecosystem and is designed for scalability, clean architecture, and real-world usage with JWT security and MySQL persistence.
+This backend service powers the PG Finder ecosystem and is designed for scalability, clean architecture, and real-world usage with JWT security, PostgreSQL persistence, Redis-based caching, and distributed rate limiting.
+
 
 🚀 Features
 
-🔐 JWT Authentication & Role-Based Authorization
+🔐 JWT Authentication & Role-Based Authorization  
+🏘️ PG & Room Management  
+🔎 Advanced PG Search with filters  
+📅 Booking Management (User & Owner views)  
+⭐ Reviews & Ratings  
+📊 Owner Analytics Dashboard  
+💳 Payment Simulation (Admin-only)  
+⚡ Redis-based Caching  
+🚦 Distributed Rate Limiting (Redis-backed)  
+🐳 Dockerized Setup (Backend + PostgreSQL + Redis)  
+📄 Swagger API Documentation  
 
-🏘️ PG & Room Management
 
-🔎 Advanced PG Search with filters
 
-📅 Booking Management (User & Owner views)
 
-⭐ Reviews & Ratings
+🧠 Architecture Highlights
 
-📊 Owner Analytics Dashboard
+- Stateless JWT-based authentication
+- Redis-backed distributed caching
+- Redis-backed rate limiting at security filter level
+- Clean layered architecture (Controller → Service → Repository)
+- Docker-first local and production setup
 
-💳 Payment Simulation (Admin-only)
 
-🐳 Dockerized Setup (Backend + PostgreSQL)
-
-📄 Swagger API Documentation
 ```
 > All secured APIs require:
 > Authorization: Bearer <JWT_TOKEN>
 ```
 
 🛠 Tech Stack
-| Layer      | Technology                  |
-| ---------- | --------------------------- |
-| Backend    | Spring Boot 4, Java 17      |
-| Security   | Spring Security, JWT        |
-| Database   | PostgreSQL 15               |
-| ORM        | Hibernate, JPA              |
-| Build Tool | Maven                       |
-| Containers | Docker, Docker Compose      |
-| Docs       | Swagger (Springdoc OpenAPI) |
+
+| Layer        | Technology                          |
+|-------------|--------------------------------------|
+| Backend     | Spring Boot 4, Java 17                |
+| Security    | Spring Security, JWT                 |
+| Database    | PostgreSQL 15                        |
+| Cache       | Redis                                |
+| Rate Limit  | Redis (Custom Spring Security Filter)|
+| ORM         | Hibernate, JPA                       |
+| Build Tool  | Maven                                |
+| Containers  | Docker, Docker Compose               |
+| Docs        | Swagger (Springdoc OpenAPI)          |
+
+⚡ Redis & Rate Limiting
+
+This application uses Redis for:
+
+- Caching high-read public APIs (e.g. PG listings)
+- Implementing distributed rate limiting to prevent API abuse
+
+### Rate Limiting Details
+- Implemented as a custom Spring Security filter
+- Redis-backed counters with TTL-based sliding window
+- Limits excessive requests per IP per minute
+- Automatically resets after time window expires
+
+### Example Behavior
+- Normal traffic → HTTP 200
+- Excessive requests → HTTP 429 (Too Many Requests)
 
 
 👥 Roles & Permissions
@@ -95,7 +125,7 @@ pg-finder-backend/
 │           └── db/migration/               # Flyway migration scripts
 │
 ├── Dockerfile                            # Backend Docker image
-├── docker-compose.yml                    # App + PostgreSQL
+├── docker-compose.yml                    # App + PostgreSQL + Redis
 ├── pom.xml                               # Maven build config
 └── README.md                             # Project documentation
  configuration
