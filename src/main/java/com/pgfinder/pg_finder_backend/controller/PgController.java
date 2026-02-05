@@ -19,6 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -53,12 +54,19 @@ public class PgController {
     @GetMapping
     public ResponseEntity<ApiResponse<List<PgPublicDetailResponse>>> getAllPgs() {
 
+        List<PgPublicDetailResponse> pgs =
+
+                Arrays.asList(pgService.getAllPgs());
+
         return ResponseEntity.ok(
-                new ApiResponse<>(true,
+                new ApiResponse<>(
+                        true,
                         "PGs fetched successfully",
-                        pgService.getAllPgs())
+                        pgs
+                )
         );
     }
+
 
     // ========================
     // Public – View PG

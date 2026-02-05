@@ -21,6 +21,8 @@ import com.pgfinder.pg_finder_backend.service.PgService;
 import com.pgfinder.pg_finder_backend.specification.PgSpecification;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.*;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
@@ -43,6 +45,7 @@ public class PgServiceImpl implements PgService {
     // ---------------- CREATE ----------------
 
     @Override
+    @CacheEvict(value = "pg_listings", allEntries = true)
     public PgResponse createPg(CreatePgRequest request, Long userId) {
 
         if (pgRepository.existsByPgNameAndPgAddress(
@@ -73,12 +76,14 @@ public class PgServiceImpl implements PgService {
     // ---------------- PUBLIC ----------------
 
     @Override
-    public List<PgPublicDetailResponse> getAllPgs() {
+    @Cacheable("pg_listings")
+    public PgPublicDetailResponse[] getAllPgs() {
         return pgRepository.findByStatus(PgStatus.ACTIVE)
                 .stream()
                 .map(PgMapper::toPublic)
-                .toList();
+                .toArray(PgPublicDetailResponse[]::new);
     }
+
 
     @Override
     public PgPublicDetailResponse getPublicPgById(Long pgId) {
@@ -119,6 +124,7 @@ public class PgServiceImpl implements PgService {
     // ---------------- OWNER / ADMIN ----------------
 
     @Override
+    @CacheEvict(value = "pg_listings", allEntries = true)
     public PgResponse updatePg(Long pgId, UpdatePgRequest request, Long userId) {
 
         Pg pg = getPgForOwner(pgId, userId);
@@ -130,6 +136,7 @@ public class PgServiceImpl implements PgService {
     }
 
     @Override
+    @CacheEvict(value = "pg_listings", allEntries = true)
     public void deletePg(Long pgId, Long userId) {
 
         Pg pg = getPgForOwnerOrAdmin(pgId, userId);
